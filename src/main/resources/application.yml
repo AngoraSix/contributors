@@ -1,0 +1,22 @@
+context:
+  initializer:
+    classes: com.angorasix.contributors.BeansInitializer
+server:
+  port: ${A6_CONTRIBUTORS_PORT:9081}
+
+spring:
+  config:
+    import: classpath:/api.yml, classpath:/security.client.yml, classpath:/security.authorizationserver.yml
+  application:
+    name: ${A6_PROJECTS_CORE_APP_NAME:contributors}
+  data:
+    mongodb:
+      uri: ${A6_PROJECTS_CORE_MONGO_DB_URI:mongodb://localhost:27017/contributors}
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id: 174901881980-h19g4ghkjju4juhm6qf0tqgclsnki5ip.apps.googleusercontent.com
+#            client-secret: gBBEYsLymVo8OKZuPLZISJPO
+

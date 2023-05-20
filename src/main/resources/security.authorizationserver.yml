@@ -1,0 +1,23 @@
+spring:
+  security:
+    oauth2:
+      authorizationserver:
+        client:
+          a6Client:
+            registration:
+              client-id: a6Client
+              secret: a6Secret
+              client-authentication-methods:
+                - client_secret_basic
+              authorization-grant-types:
+                - authorization_code
+                - refresh_token
+              redirect-uris:
+                - https://localhost:9081/login/oauth2/code/a6Client
+              scopes:
+                - openid
+                - profile
+                - email
+                - phone
+                - address
+              require-authorization-consent: true

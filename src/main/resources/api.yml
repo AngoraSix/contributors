@@ -1,0 +1,41 @@
+configs:
+  api:
+    headers:
+      contributor: ${A6_PROJECTS_PRESENTATIONS_CONTRIBUTORHEADER:A6-Contributor}
+    basePaths:
+      contributor: "/contributors"
+    routes:
+      baseCrudRoute: ""
+      getAuthenticatedContributor:
+        name: getAuthenticatedContributor
+        basePaths:
+          - ${configs.api.basePaths.contributor}
+        method: GET
+        path: ${configs.api.routes.baseCrudRoute}
+
+#      baseListCrudRoute: ""
+#      baseByIdCrudRoute: "/{id}"
+#      createProjectPresentation:
+#        name: createProjectPresentation
+#        basePaths:
+#          - ${configs.api.basePaths.contributor}
+#        method: POST
+#        path: ${configs.api.routes.baseListCrudRoute}
+#      updateProjectPresentation:
+#        name: updateProjectPresentation
+#        basePaths:
+#          - ${configs.api.basePaths.contributor}
+#        method: PUT
+#        path: ${configs.api.routes.baseByIdCrudRoute}
+#      getProjectPresentation:
+#        name: getProjectPresentation
+#        basePaths:
+#          - ${configs.api.basePaths.contributor}
+#        method: GET
+#        path: ${configs.api.routes.baseByIdCrudRoute}
+#      listProjectPresentations:
+#        name: listProjectPresentations
+#        basePaths:
+#          - ${configs.api.basePaths.contributor}
+#        method: GET
+#        path: ${configs.api.routes.baseListCrudRoute}
