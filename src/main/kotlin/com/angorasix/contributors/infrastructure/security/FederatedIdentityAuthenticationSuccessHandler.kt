@@ -1,8 +1,8 @@
 package com.angorasix.contributors.infrastructure.security
 
+import com.angorasix.contributors.application.ContributorService
 import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.domain.contributor.ContributorMedia
-import com.angorasix.contributors.domain.contributor.ContributorRepository
 import com.angorasix.contributors.domain.contributor.ProviderUser
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -30,14 +30,14 @@ class FederatedIdentityAuthenticationSuccessHandler :
     private var oauth2UserHandler: Consumer<OAuth2User> = Consumer<OAuth2User> { user -> }
     private var oidcUserHandler: Consumer<OidcUser> = Consumer<OidcUser> { user ->
         oauth2UserHandler.accept(
-            user
+            user,
         )
     }
 
     override fun onAuthenticationSuccess(
         request: HttpServletRequest?,
         response: HttpServletResponse?,
-        authentication: Authentication
+        authentication: Authentication,
     ) {
         if (authentication is OAuth2AuthenticationToken) {
             if (authentication.principal is OidcUser) {
@@ -58,34 +58,34 @@ class FederatedIdentityAuthenticationSuccessHandler :
     }
 }
 
-class ContributorRepositoryOAuth2UserHandler(val contributorRepository: ContributorRepository) :
+class ContributorRepositoryOAuth2UserHandler(val contributorService: ContributorService) :
     Consumer<OAuth2User> {
     override fun accept(user: OAuth2User) {
         val providerUser =
             generateOAuth2ProviderUser(user)
         persistContributor(
-            contributorRepository,
+            contributorService,
             providerUser,
             user.attributes["email"] as String?,
             (user.attributes["given_name"] ?: user.attributes["name"] ?: user.name) as String?,
             user.attributes["family_name"] as String?,
-            user.attributes["picture"] as String?
+            user.attributes["picture"] as String?,
         )
     }
 }
 
-class ContributorRepositoryOidcUserHandler(val contributorRepository: ContributorRepository) :
+class ContributorRepositoryOidcUserHandler(val contributorService: ContributorService) :
     Consumer<OidcUser> {
     override fun accept(user: OidcUser) {
         val providerUser =
             generateOidcProviderUser(user)
         persistContributor(
-            contributorRepository,
+            contributorService,
             providerUser,
             user.email,
             user.givenName ?: user.nickName ?: user.preferredUsername ?: user.fullName ?: user.name,
             user.familyName,
-            user.picture
+            user.picture,
         )
     }
 }
@@ -106,7 +106,7 @@ private fun generateProviderUser(issuer: URL?, subject: String?): ProviderUser {
 }
 
 private fun persistContributor(
-    contributorRepository: ContributorRepository,
+    contributorService: ContributorService,
     providerUser: ProviderUser,
     email: String?,
     firstName: String?,
@@ -114,11 +114,9 @@ private fun persistContributor(
     profilePicture: String?,
 ) {
     // Capture user in a local data store on first authentication
-    if (contributorRepository.findDistinctByProviderUsers(providerUser) == null) {
-        val profileMedia = profilePicture?.let { ContributorMedia("image", it, it, it) } ?: null
-        val contributor = Contributor(providerUser, email, firstName, lastName, profileMedia)
-        contributorRepository.save(contributor)
-    }
+    val profileMedia = profilePicture?.let { ContributorMedia("image", it, it, it) } ?: null
+    val contributor = Contributor(providerUser, email, firstName, lastName, profileMedia)
+    contributorService.persistNewLoginContributor(providerUser, contributor)
 }
 
 fun extractProviderUser(principal: Principal): ProviderUser {

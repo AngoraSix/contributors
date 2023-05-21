@@ -11,12 +11,12 @@ import org.springframework.data.annotation.PersistenceCreator
  */
 data class Contributor @PersistenceCreator private constructor(
     @field:Id val id: String?,
-    val providerUsers: Set<ProviderUser>,
-    var email: String?,
+    val providerUsers: MutableSet<ProviderUser>,
+    val email: String?,
     var firstName: String?,
     var lastName: String?,
-    val profileMedia: ContributorMedia?,
-    val headMedia: ContributorMedia?,
+    var profileMedia: ContributorMedia?,
+    var headMedia: ContributorMedia?,
 ) {
 
     /**
@@ -36,11 +36,19 @@ data class Contributor @PersistenceCreator private constructor(
         headMedia: ContributorMedia? = null,
     ) : this(
         null,
-        setOf(providerUser),
+        mutableSetOf(providerUser),
         email,
         firstName,
         lastName,
         profileMedia,
         headMedia,
     )
+
+    fun mergeProviderUser(providerUser: ProviderUser, contributor: Contributor) {
+        this.providerUsers.add(providerUser)
+        this.firstName = this.firstName ?: contributor.firstName
+        this.lastName = this.lastName ?: contributor.lastName
+        this.profileMedia = this.profileMedia ?: contributor.profileMedia
+        this.headMedia = this.headMedia ?: contributor.headMedia
+    }
 }
