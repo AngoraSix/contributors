@@ -6,6 +6,9 @@ import com.angorasix.contributors.infrastructure.security.ContributorRepositoryO
 import com.angorasix.contributors.infrastructure.security.FederatedIdentityAuthenticationSuccessHandler
 import com.angorasix.contributors.infrastructure.security.authorizationServerSecurityFilterChain
 import com.angorasix.contributors.infrastructure.security.defaultSecurityFilterChain
+import com.angorasix.contributors.infrastructure.security.definePasswordEncoder
+import com.angorasix.contributors.infrastructure.security.tokenCustomizer
+import com.angorasix.contributors.infrastructure.security.tokenGenerator
 import com.angorasix.contributors.presentation.handler.ContributorHandler
 import com.angorasix.contributors.presentation.router.ContributorRouter
 import org.springframework.context.ApplicationContextInitializer
@@ -13,8 +16,17 @@ import org.springframework.context.support.GenericApplicationContext
 import org.springframework.context.support.beans
 
 val beans = beans {
+    bean {
+        definePasswordEncoder()
+    }
+    bean {
+        tokenCustomizer(ref())
+    }
+    bean {
+        tokenGenerator(ref(), ref())
+    }
     bean{
-        authorizationServerSecurityFilterChain(ref())
+        authorizationServerSecurityFilterChain(ref(), ref())
     }
     bean{
         val authenticationSuccessHandler = FederatedIdentityAuthenticationSuccessHandler()

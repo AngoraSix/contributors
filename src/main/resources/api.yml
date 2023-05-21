@@ -1,7 +1,7 @@
 configs:
   api:
     headers:
-      contributor: ${A6_PROJECTS_PRESENTATIONS_CONTRIBUTORHEADER:A6-Contributor}
+      contributor: ${A6_CONTRIBUTORS_CONTRIBUTORHEADER:A6-Contributor}
     basePaths:
       contributor: "/contributors"
     routes:
