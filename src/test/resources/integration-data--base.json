@@ -1,0 +1,19 @@
+[
+  {
+    "providerUsers": [
+      {
+        "issuer": "https://accounts.google.com",
+        "subject": "111111111111111111111"
+      }
+    ],
+    "email": "user@gmail.com",
+    "firstName": "UserFirstName",
+    "lastName": "UserLastName",
+    "profileMedia": {
+      "mediaType": "image",
+      "url": "https://lh3.googleusercontent.com/a/AAcHTtfgBfomyG56_01URKdMZPfF1rYYCWs6OVhMPPW1Rg=s96-c",
+      "thumbnailUrl": "https://lh3.googleusercontent.com/a/AAcHTtfgBfomyG56_01URKdMZPfF1rYYCWs6OVhMPPW1Rg=s96-c",
+      "resourceId": "https://lh3.googleusercontent.com/a/AAcHTtfgBfomyG56_01URKdMZPfF1rYYCWs6OVhMPPW1Rg=s96-c"
+    }
+  }
+]

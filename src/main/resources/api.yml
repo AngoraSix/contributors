@@ -1,0 +1,55 @@
+configs:
+  api:
+    headers:
+      contributor: ${A6_CONTRIBUTORS_CONTRIBUTORHEADER:A6-Contributor}
+    basePaths:
+      contributor: "/contributors"
+    routes:
+      baseCrudRoute: ""
+      baseByIdCrudRoute: "/{id}"
+#      not necessary, should be part of id_token
+#      getAuthenticatedContributor:
+#        name: getAuthenticatedContributor
+#        basePaths:
+#          - ${configs.api.basePaths.contributor}
+#        method: GET
+#        path: "/me"
+      getContributor:
+        name: getContributor
+        basePaths:
+          - ${configs.api.basePaths.contributor}
+        method: GET
+        path: ${configs.api.routes.baseByIdCrudRoute}
+      updateContributor:
+        name: updateAuthenticatedContributor
+        basePaths:
+          - ${configs.api.basePaths.contributor}
+        method: PUT
+        path: ${configs.api.routes.baseByIdCrudRoute}
+
+#      baseListCrudRoute: ""
+#      baseByIdCrudRoute: "/{id}"
+#      createProjectPresentation:
+#        name: createProjectPresentation
+#        basePaths:
+#          - ${configs.api.basePaths.contributor}
+#        method: POST
+#        path: ${configs.api.routes.baseListCrudRoute}
+#      updateProjectPresentation:
+#        name: updateProjectPresentation
+#        basePaths:
+#          - ${configs.api.basePaths.contributor}
+#        method: PUT
+#        path: ${configs.api.routes.baseByIdCrudRoute}
+#      getProjectPresentation:
+#        name: getProjectPresentation
+#        basePaths:
+#          - ${configs.api.basePaths.contributor}
+#        method: GET
+#        path: ${configs.api.routes.baseByIdCrudRoute}
+#      listProjectPresentations:
+#        name: listProjectPresentations
+#        basePaths:
+#          - ${configs.api.basePaths.contributor}
+#        method: GET
+#        path: ${configs.api.routes.baseListCrudRoute}

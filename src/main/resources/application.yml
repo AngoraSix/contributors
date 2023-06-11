@@ -1,0 +1,15 @@
+context:
+  initializer:
+    classes: com.angorasix.contributors.BeansInitializer
+server:
+  port: ${A6_CONTRIBUTORS_PORT:9081}
+
+spring:
+  config:
+    import: classpath:/api.yml, classpath:/security.client.yml, classpath:/security.authorizationserver.yml
+  application:
+    name: ${A6_CONTRIBUTORS_APP_NAME:contributors}
+  data:
+    mongodb:
+      uri: ${A6_CONTRIBUTORS_MONGO_DB_URI:mongodb://localhost:27017/contributors}
+

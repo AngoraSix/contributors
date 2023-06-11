@@ -1,0 +1,24 @@
+spring:
+  security:
+    oauth2:
+      authorizationserver:
+        client:
+          a6Client:
+            registration:
+              client-id: ${A6_CONTRIBUTORS_AUTHZ_CLIENT_ID:a6Client}
+              # a6Secret
+              client-secret: ${A6_CONTRIBUTORS_AUTHZ_CLIENT_SECRET:{bcrypt}$2a$10$bs.bRnOmdu9WZ.3A7jE8YunQgSdTCsQ71PEL8xSieMKxU2lFfZtzW}
+              client-authentication-methods:
+                - client_secret_basic
+              authorization-grant-types:
+                - authorization_code
+                - refresh_token
+              redirect-uris:
+                - ${A6_CONTRIBUTORS_AUTHZ_REDIRECT_URI:http://localhost:9090/api/auth/callback/angorasixspring}
+              scopes:
+                - openid
+                - profile
+                - email
+                - phone
+                - address
+              require-authorization-consent: true
