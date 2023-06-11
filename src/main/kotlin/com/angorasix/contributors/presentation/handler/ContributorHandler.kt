@@ -4,11 +4,11 @@ import com.angorasix.contributors.application.ContributorService
 import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.domain.contributor.ContributorMedia
 import com.angorasix.contributors.domain.contributor.ProviderUser
-import com.angorasix.contributors.infrastructure.config.configurationproperty.api.ApiConfigs
 import com.angorasix.contributors.infrastructure.security.extractProviderUser
 import com.angorasix.contributors.presentation.dto.ContributorDto
 import com.angorasix.contributors.presentation.dto.ContributorMediaDto
 import org.springframework.hateoas.MediaTypes
+import org.springframework.http.HttpStatus
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.principalOrNull
@@ -20,12 +20,11 @@ import org.springframework.web.servlet.function.principalOrNull
  */
 class ContributorHandler(
     private val service: ContributorService,
-    private val apiConfigs: ApiConfigs,
 ) {
 
     /**
-     * Handler for the Get Single Contributor endpoint,
-     * retrieving a Mono with the requested Contributor.
+     * Handler for the Get Single Contributor (Authenticated) endpoint,
+     * retrieving the authenticated Contributor.
      *
      * @param request - HTTP `ServerRequest` object
      * @return the `ServerResponse`
@@ -41,15 +40,62 @@ class ContributorHandler(
             }
         } ?: ServerResponse.notFound().build()
     }
+
+    /**
+     * Handler for the Get Single Contributor (Authenticated) endpoint,
+     * retrieving the authenticated Contributor.
+     *
+     * @param request - HTTP `ServerRequest` object
+     * @return the `ServerResponse`
+     */
+    fun getContributor(request: ServerRequest): ServerResponse {
+        val contributorId = request.pathVariable("id")
+        val requestingProviderUser = request.principalOrNull()?.let { extractProviderUser(it) }
+        val contributor =
+            service.findSingleContributor(contributorId)?.convertToDto(requestingProviderUser)
+        return contributor?.let {
+            ServerResponse.ok().contentType(MediaTypes.HAL_FORMS_JSON)
+                .body(it)
+        } ?: ServerResponse.notFound().build()
+    }
+
+    /**
+     * Handler for the Update Authenticated Contributor endpoint.
+     *
+     * @param request - HTTP `ServerRequest` object
+     * @return the `ServerResponse`
+     */
+    fun updateContributor(request: ServerRequest): ServerResponse {
+        return request.principalOrNull()?.let { principal ->
+            val contributorId = request.pathVariable("id")
+            val providerUser = extractProviderUser(principal)
+            val contributorToUpdate = service.checkContributor(contributorId, providerUser)
+            contributorToUpdate?.let {
+                val updateContributorData =
+                    request.body(ContributorDto::class.java).convertToDomain(providerUser)
+                val contributor =
+                    service.updateContributor(it, updateContributorData)
+                        ?.convertToDto(providerUser)
+                contributor?.let {
+                    return ServerResponse.ok().contentType(MediaTypes.HAL_FORMS_JSON)
+                        .body(it)
+                }
+            } ?: ServerResponse.status(HttpStatus.FORBIDDEN).build()
+        } ?: ServerResponse.status(HttpStatus.FORBIDDEN).build()
+    }
 }
 
-private fun Contributor.convertToDto(forProvider: ProviderUser?): ContributorDto {
-    val filteredProviderUsers = forProvider?.let {
-        if (!providerUsers.contains(it)) {
-            throw IllegalArgumentException("Can't access contributor for provider ${forProvider.issuer}")
-        }
-        setOf(forProvider)
-    } ?: providerUsers
+private fun Contributor.convertToDto(
+    requestingProvider: ProviderUser?,
+    showAllProviderUsers: Boolean = false,
+): ContributorDto {
+    val filteredProviderUsers = if (showAllProviderUsers) {
+        providerUsers
+    } else if (requestingProvider != null && providerUsers.contains(requestingProvider)) {
+        setOf(requestingProvider)
+    } else {
+        emptySet()
+    }
     return ContributorDto(
         filteredProviderUsers,
         email,
@@ -57,29 +103,32 @@ private fun Contributor.convertToDto(forProvider: ProviderUser?): ContributorDto
         lastName,
         profileMedia?.convertToDto(),
         headMedia?.convertToDto(),
-        id
+        id,
     )
 }
 
+private fun ContributorDto.convertToDomain(forProviderUser: ProviderUser): Contributor {
+    return Contributor(
+        forProviderUser,
+        email,
+        firstName,
+        lastName,
+        profileMedia?.convertToDomain(),
+        headMedia?.convertToDomain(),
+    )
+}
 
-//private fun Contributor.convertToDto(
-//    requestingContributor: RequestingContributor?,
-//    apiConfigs: ApiConfigs,
-//    request: ServerRequest,
-//): ContributorDto =
-//    convertToDto().resolveHypermedia(requestingContributor, apiConfigs, request)
-
-//private fun ContributorDto.convertToDomain(): Contributor {
-//    return Contributor(
-//        projectId ?: throw IllegalArgumentException("ProjectPresentation projectId expected"),
-//        referenceName ?: throw IllegalArgumentException(
-//            "ProjectPresentation referenceName expected",
-//        ),
-//        sections?.map { it.convertToDomain() }?.toMutableSet(),
-//    )
-//}
 private fun ContributorMedia.convertToDto(): ContributorMediaDto {
     return ContributorMediaDto(
+        mediaType,
+        url,
+        thumbnailUrl,
+        resourceId,
+    )
+}
+
+private fun ContributorMediaDto.convertToDomain(): ContributorMedia {
+    return ContributorMedia(
         mediaType,
         url,
         thumbnailUrl,

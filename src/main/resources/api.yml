@@ -6,12 +6,26 @@ configs:
       contributor: "/contributors"
     routes:
       baseCrudRoute: ""
-      getAuthenticatedContributor:
-        name: getAuthenticatedContributor
+      baseByIdCrudRoute: "/{id}"
+#      not necessary, should be part of id_token
+#      getAuthenticatedContributor:
+#        name: getAuthenticatedContributor
+#        basePaths:
+#          - ${configs.api.basePaths.contributor}
+#        method: GET
+#        path: "/me"
+      getContributor:
+        name: getContributor
         basePaths:
           - ${configs.api.basePaths.contributor}
         method: GET
-        path: ${configs.api.routes.baseCrudRoute}
+        path: ${configs.api.routes.baseByIdCrudRoute}
+      updateContributor:
+        name: updateAuthenticatedContributor
+        basePaths:
+          - ${configs.api.basePaths.contributor}
+        method: PUT
+        path: ${configs.api.routes.baseByIdCrudRoute}
 
 #      baseListCrudRoute: ""
 #      baseByIdCrudRoute: "/{id}"

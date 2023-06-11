@@ -6,7 +6,7 @@ package com.angorasix.contributors.domain.contributor
  *
  * @author rozagerardo
  */
-class ContributorMedia (
+class ContributorMedia(
     val mediaType: String,
     val url: String,
     val thumbnailUrl: String,

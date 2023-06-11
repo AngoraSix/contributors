@@ -15,5 +15,5 @@ import org.springframework.hateoas.support.WebStack
 class ContributorsApplication
 
 fun main(args: Array<String>) {
-    runApplication<ContributorsApplication>(*args)
+    runApplication<ContributorsApplication>(args = args)
 }

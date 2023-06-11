@@ -10,12 +10,13 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.oauth2.core.user.OAuth2User
+import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler
 import java.net.URL
 import java.security.Principal
 import java.util.function.Consumer
-
 
 /**
  * <p>
@@ -63,13 +64,20 @@ class ContributorRepositoryOAuth2UserHandler(val contributorService: Contributor
     override fun accept(user: OAuth2User) {
         val providerUser =
             generateOAuth2ProviderUser(user)
-        persistContributor(
-            contributorService,
+        val profileMedia =
+            (user.attributes["picture"] as String?)?.let { ContributorMedia("image", it, it, it) }
+                ?: null
+        val contributor = Contributor(
             providerUser,
             user.attributes["email"] as String?,
             (user.attributes["given_name"] ?: user.attributes["name"] ?: user.name) as String?,
             user.attributes["family_name"] as String?,
-            user.attributes["picture"] as String?,
+            profileMedia,
+        )
+        persistContributor(
+            contributorService,
+            providerUser,
+            contributor,
         )
     }
 }
@@ -79,13 +87,18 @@ class ContributorRepositoryOidcUserHandler(val contributorService: ContributorSe
     override fun accept(user: OidcUser) {
         val providerUser =
             generateOidcProviderUser(user)
-        persistContributor(
-            contributorService,
+        val profileMedia = user.picture?.let { ContributorMedia("image", it, it, it) } ?: null
+        val contributor = Contributor(
             providerUser,
             user.email,
             user.givenName ?: user.nickName ?: user.preferredUsername ?: user.fullName ?: user.name,
             user.familyName,
-            user.picture,
+            profileMedia,
+        )
+        persistContributor(
+            contributorService,
+            providerUser,
+            contributor,
         )
     }
 }
@@ -98,6 +111,10 @@ private fun generateOAuth2ProviderUser(user: OAuth2User): ProviderUser {
     return generateProviderUser(user.attributes["iss"] as URL?, user.attributes["sub"] as String?)
 }
 
+private fun generateJwtProviderUser(user: Jwt): ProviderUser {
+    return generateProviderUser(user.issuer, user.subject)
+}
+
 private fun generateProviderUser(issuer: URL?, subject: String?): ProviderUser {
     if (issuer == null || subject == null) {
         throw IllegalArgumentException("Login data doesn't include required 'iss' and 'sub' parameters")
@@ -108,24 +125,30 @@ private fun generateProviderUser(issuer: URL?, subject: String?): ProviderUser {
 private fun persistContributor(
     contributorService: ContributorService,
     providerUser: ProviderUser,
-    email: String?,
-    firstName: String?,
-    lastName: String?,
-    profilePicture: String?,
+    contributor: Contributor,
 ) {
     // Capture user in a local data store on first authentication
-    val profileMedia = profilePicture?.let { ContributorMedia("image", it, it, it) } ?: null
-    val contributor = Contributor(providerUser, email, firstName, lastName, profileMedia)
     contributorService.persistNewLoginContributor(providerUser, contributor)
 }
 
 fun extractProviderUser(principal: Principal): ProviderUser {
-    if (principal is OidcUser) {
-        return generateOidcProviderUser(principal)
-    } else if (principal is OAuth2User) {
-        return generateOAuth2ProviderUser(principal)
-    } else if (principal is OAuth2AuthenticationToken) {
-        return generateOAuth2ProviderUser(principal.principal)
+    return when (principal) {
+        is OidcUser -> {
+            generateOidcProviderUser(principal)
+        }
+
+        is OAuth2User -> {
+            generateOAuth2ProviderUser(principal)
+        }
+
+        is OAuth2AuthenticationToken -> {
+            generateOAuth2ProviderUser(principal.principal)
+        }
+
+        is JwtAuthenticationToken -> {
+            generateJwtProviderUser(principal.token)
+        }
+
+        else -> throw IllegalArgumentException("Authentication is not based on OAuth Login")
     }
-    throw IllegalArgumentException("Authentication is not based on OAuth Login")
 }

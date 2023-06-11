@@ -25,10 +25,10 @@ val beans = beans {
     bean {
         tokenGenerator(ref(), ref())
     }
-    bean{
+    bean {
         authorizationServerSecurityFilterChain(ref(), ref())
     }
-    bean{
+    bean {
         val authenticationSuccessHandler = FederatedIdentityAuthenticationSuccessHandler()
         authenticationSuccessHandler.setOAuth2UserHandler(ContributorRepositoryOAuth2UserHandler(ref()))
         authenticationSuccessHandler.setOidcUserHandler(ContributorRepositoryOidcUserHandler(ref()))
@@ -37,7 +37,7 @@ val beans = beans {
     bean<ContributorService>()
     bean<ContributorHandler>()
     bean {
-        ContributorRouter(ref(), ref(), ref()).projectRouterFunction()
+        ContributorRouter(ref(), ref()).projectRouterFunction()
     }
 }
 

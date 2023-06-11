@@ -2,7 +2,6 @@ package com.angorasix.contributors.infrastructure.config.configurationproperty.a
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.NestedConfigurationProperty
-import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 
 /**
@@ -19,7 +18,7 @@ data class ApiConfigs(
     @NestedConfigurationProperty
     var routes: RoutesConfigs,
     @NestedConfigurationProperty
-    var basePaths: BasePathConfigs
+    var basePaths: BasePathConfigs,
 )
 
 data class HeadersConfigs constructor(val contributor: String)
@@ -28,13 +27,9 @@ data class BasePathConfigs constructor(val contributor: String)
 
 data class RoutesConfigs constructor(
     val baseCrudRoute: String,
-    val getAuthenticatedContributor: Route
-//    val baseListCrudRoute: String,
-//    val baseByIdCrudRoute: String,
-//    val createContributor: Route,
-//    val updateContributor: Route,
-//    val getContributor: Route,
-//    val listContributors: Route,
+    val baseByIdCrudRoute: String,
+    val getContributor: Route,
+    val updateContributor: Route,
 )
 
 data class Route(

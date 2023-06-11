@@ -2,7 +2,6 @@ package com.angorasix.contributors.presentation.router
 
 import com.angorasix.contributors.infrastructure.config.configurationproperty.api.ApiConfigs
 import com.angorasix.contributors.presentation.handler.ContributorHandler
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.web.servlet.function.RouterFunction
 import org.springframework.web.servlet.function.router
 
@@ -13,7 +12,6 @@ import org.springframework.web.servlet.function.router
  */
 class ContributorRouter(
     private val handler: ContributorHandler,
-    private val objectMapper: ObjectMapper,
     private val apiConfigs: ApiConfigs,
 ) {
 
@@ -24,11 +22,17 @@ class ContributorRouter(
      */
     fun projectRouterFunction() = router {
         apiConfigs.basePaths.contributor.nest {
-            apiConfigs.routes.baseCrudRoute.nest {
-                method(apiConfigs.routes.getAuthenticatedContributor.method).nest {
+            apiConfigs.routes.baseByIdCrudRoute.nest {
+                method(apiConfigs.routes.getContributor.method).nest {
                     method(
-                        apiConfigs.routes.getAuthenticatedContributor.method,
-                        handler::getAuthenticatedContributor,
+                        apiConfigs.routes.getContributor.method,
+                        handler::getContributor,
+                    )
+                }
+                method(apiConfigs.routes.updateContributor.method).nest {
+                    method(
+                        apiConfigs.routes.updateContributor.method,
+                        handler::updateContributor,
                     )
                 }
             }

@@ -8,7 +8,7 @@ import java.net.URL
  *
  * @author rozagerardo
  */
-data class ProviderUser (
+data class ProviderUser(
     val issuer: URL,
     val subject: String,
 )
