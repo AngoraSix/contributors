@@ -33,7 +33,7 @@ class ContributorRouterUnitTest {
         "",
         "/{id}",
         Route("mocked-get-single", listOf("mocked-base1"), HttpMethod.GET, "/{id}"),
-        Route("mocked-update", listOf("mocked-base1"), HttpMethod.PUT, "/{id}"),
+        Route("mocked-modify", listOf("mocked-base1"), HttpMethod.PATCH, "/{id}"),
     )
     private var basePathsConfigs: BasePathConfigs = BasePathConfigs("/contributors")
 
@@ -50,15 +50,15 @@ class ContributorRouterUnitTest {
         runTest {
             val outputRouter = router.projectRouterFunction()
             val getSingleContributorRequest = ServerRequest.create(MockHttpServletRequest("GET", "/contributors/123"), emptyList())
-            val getUpdateProjectRequest = ServerRequest.create(MockHttpServletRequest("PUT", "/contributors/123"), emptyList())
+            val getPatchProjectRequest = ServerRequest.create(MockHttpServletRequest("PATCH", "/contributors/123"), emptyList())
             val invalidRequest = ServerRequest.create(MockHttpServletRequest("GET", "/other/anything"), emptyList())
             val mockedResponse = ServerResponse.ok().build()
             every { handler.getContributor(getSingleContributorRequest) } returns mockedResponse
-            every { handler.updateContributor(getUpdateProjectRequest) } returns mockedResponse
+            every { handler.patchContributor(getPatchProjectRequest) } returns mockedResponse
 
             // if routes don't match, they will throw an exception as with the invalid Route no need to assert anything
             outputRouter.route(getSingleContributorRequest).get().handle(getSingleContributorRequest)
-            outputRouter.route(getUpdateProjectRequest).get().handle(getUpdateProjectRequest)
+            outputRouter.route(getPatchProjectRequest).get().handle(getPatchProjectRequest)
             assertThat(outputRouter.route(invalidRequest)).isEmpty
         }
 }

@@ -29,7 +29,8 @@ data class RoutesConfigs constructor(
     val baseCrudRoute: String,
     val baseByIdCrudRoute: String,
     val getContributor: Route,
-    val updateContributor: Route,
+//    val updateContributor: Route,
+    val patchContributor: Route,
 )
 
 data class Route(
