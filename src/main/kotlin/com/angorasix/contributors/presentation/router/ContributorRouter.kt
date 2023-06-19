@@ -1,6 +1,7 @@
 package com.angorasix.contributors.presentation.router
 
 import com.angorasix.contributors.infrastructure.config.configurationproperty.api.ApiConfigs
+import com.angorasix.contributors.presentation.filters.extractServletRequestingContributor
 import com.angorasix.contributors.presentation.handler.ContributorHandler
 import org.springframework.web.servlet.function.RouterFunction
 import org.springframework.web.servlet.function.router
@@ -22,6 +23,12 @@ class ContributorRouter(
      */
     fun projectRouterFunction() = router {
         apiConfigs.basePaths.contributor.nest {
+            filter { request, next ->
+                extractServletRequestingContributor(
+                    request,
+                    next,
+                )
+            }
             apiConfigs.routes.baseByIdCrudRoute.nest {
                 method(apiConfigs.routes.getContributor.method).nest {
                     method(
@@ -29,10 +36,10 @@ class ContributorRouter(
                         handler::getContributor,
                     )
                 }
-                method(apiConfigs.routes.updateContributor.method).nest {
+                method(apiConfigs.routes.patchContributor.method).nest {
                     method(
-                        apiConfigs.routes.updateContributor.method,
-                        handler::updateContributor,
+                        apiConfigs.routes.patchContributor.method,
+                        handler::patchContributor,
                     )
                 }
             }

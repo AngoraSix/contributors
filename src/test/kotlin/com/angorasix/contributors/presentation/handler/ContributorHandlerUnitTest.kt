@@ -45,7 +45,7 @@ class ContributorHandlerUnitTest {
 
     @BeforeEach
     fun init() {
-        handler = ContributorHandler(service)
+        handler = ContributorHandler(service, objectMapper)
     }
 
     @Test

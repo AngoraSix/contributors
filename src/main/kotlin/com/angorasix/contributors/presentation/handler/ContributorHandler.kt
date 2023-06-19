@@ -1,12 +1,18 @@
 package com.angorasix.contributors.presentation.handler
 
+import com.angorasix.commons.domain.SimpleContributor
+import com.angorasix.commons.infrastructure.constants.AngoraSixInfrastructure
+import com.angorasix.commons.presentation.dto.Patch
 import com.angorasix.contributors.application.ContributorService
 import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.domain.contributor.ContributorMedia
 import com.angorasix.contributors.domain.contributor.ProviderUser
+import com.angorasix.contributors.domain.contributor.modification.ContributorModification
 import com.angorasix.contributors.infrastructure.security.extractProviderUser
 import com.angorasix.contributors.presentation.dto.ContributorDto
 import com.angorasix.contributors.presentation.dto.ContributorMediaDto
+import com.angorasix.contributors.presentation.dto.SupportedPatchOperations
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.hateoas.MediaTypes
 import org.springframework.http.HttpStatus
 import org.springframework.web.servlet.function.ServerRequest
@@ -20,6 +26,7 @@ import org.springframework.web.servlet.function.principalOrNull
  */
 class ContributorHandler(
     private val service: ContributorService,
+    private val objectMapper: ObjectMapper,
 ) {
 
     /**
@@ -57,6 +64,35 @@ class ContributorHandler(
             ServerResponse.ok().contentType(MediaTypes.HAL_FORMS_JSON)
                 .body(it)
         } ?: ServerResponse.notFound().build()
+    }
+
+    fun patchContributor(request: ServerRequest): ServerResponse {
+        return request.principalOrNull()?.let { principal ->
+            val requestingContributor =
+                request.attributes()[AngoraSixInfrastructure.REQUEST_ATTRIBUTE_CONTRIBUTOR_KEY] as SimpleContributor
+            val contributorId = request.pathVariable("id")
+            val providerUser = extractProviderUser(principal)
+            val patch = request.body(Patch::class.java)
+            val modifyOperations = patch.operations.map { patchOp ->
+                patchOp.toDomainObjectModification(
+                    requestingContributor,
+                    SupportedPatchOperations.values().map { it.op }.toList(),
+                    objectMapper,
+                )
+            }
+            val modifyContributorOperations: List<ContributorModification<Any>> =
+                modifyOperations.filterIsInstance<ContributorModification<Any>>()
+
+            val updatedContributor = service.modifyContributor(
+                requestingContributor,
+                contributorId,
+                modifyContributorOperations,
+            )?.convertToDto(providerUser)
+            updatedContributor?.let {
+                return ServerResponse.ok().contentType(MediaTypes.HAL_FORMS_JSON)
+                    .body(it)
+            }
+        } ?: ServerResponse.status(HttpStatus.FORBIDDEN).build()
     }
 
     /**

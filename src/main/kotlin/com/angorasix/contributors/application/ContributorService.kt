@@ -1,8 +1,10 @@
 package com.angorasix.contributors.application
 
+import com.angorasix.commons.domain.SimpleContributor
 import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.domain.contributor.ContributorRepository
 import com.angorasix.contributors.domain.contributor.ProviderUser
+import com.angorasix.contributors.domain.contributor.modification.ContributorModification
 import org.springframework.data.repository.findByIdOrNull
 
 /**
@@ -44,6 +46,23 @@ class ContributorService(private val repository: ContributorRepository) {
         contributorToUpdate: Contributor,
         updateData: Contributor,
     ): Contributor? = contributorToUpdate.updateWithData(updateData).let { repository.save(it) }
+
+    fun modifyContributor(
+        requestingContributor: SimpleContributor,
+        id: String,
+        modificationOperations: List<ContributorModification<out Any>>,
+    ): Contributor? {
+        val contributor = repository.findByIdOrNull(id)
+        val updatedContributor = contributor?.let {
+            modificationOperations.fold(it) { accumulatedContributor, op ->
+                op.modify(
+                    requestingContributor,
+                    accumulatedContributor,
+                )
+            }
+        }
+        return updatedContributor?.let { repository.save(it) }
+    }
 
     private fun Contributor.updateWithData(other: Contributor): Contributor {
         other.firstName?.let { this.firstName = it }
