@@ -3,6 +3,8 @@ package com.angorasix.contributors.presentation.handler
 import com.angorasix.commons.domain.SimpleContributor
 import com.angorasix.commons.infrastructure.constants.AngoraSixInfrastructure
 import com.angorasix.commons.presentation.dto.Patch
+import com.angorasix.commons.servlet.presentation.error.resolveNotFound
+import com.angorasix.commons.servlet.presentation.error.resolveUnauthorized
 import com.angorasix.contributors.application.ContributorService
 import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.domain.contributor.ContributorMedia
@@ -14,7 +16,6 @@ import com.angorasix.contributors.presentation.dto.ContributorMediaDto
 import com.angorasix.contributors.presentation.dto.SupportedPatchOperations
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.hateoas.MediaTypes
-import org.springframework.http.HttpStatus
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.principalOrNull
@@ -45,7 +46,7 @@ class ContributorHandler(
                 ServerResponse.ok().contentType(MediaTypes.HAL_FORMS_JSON)
                     .body(it)
             }
-        } ?: ServerResponse.notFound().build()
+        } ?: resolveNotFound("Can't find Contributor", "Contributor")
     }
 
     /**
@@ -63,7 +64,7 @@ class ContributorHandler(
         return contributor?.let {
             ServerResponse.ok().contentType(MediaTypes.HAL_FORMS_JSON)
                 .body(it)
-        } ?: ServerResponse.notFound().build()
+        } ?: resolveNotFound("Can't find Contributor", "Contributor")
     }
 
     fun patchContributor(request: ServerRequest): ServerResponse {
@@ -92,7 +93,10 @@ class ContributorHandler(
                 return ServerResponse.ok().contentType(MediaTypes.HAL_FORMS_JSON)
                     .body(it)
             }
-        } ?: ServerResponse.status(HttpStatus.FORBIDDEN).build()
+        } ?: resolveUnauthorized(
+            "Patch Contributor endpoint can't determine authentication principal",
+            "PRINCIPAL",
+        )
     }
 
     /**
@@ -116,8 +120,14 @@ class ContributorHandler(
                     return ServerResponse.ok().contentType(MediaTypes.HAL_FORMS_JSON)
                         .body(it)
                 }
-            } ?: ServerResponse.status(HttpStatus.FORBIDDEN).build()
-        } ?: ServerResponse.status(HttpStatus.FORBIDDEN).build()
+            } ?: resolveUnauthorized(
+                "Update Contributor endpoint can't determine authentication principal",
+                "PRINCIPAL",
+            )
+        } ?: resolveUnauthorized(
+            "Update Contributor endpoint can't determine authentication principal",
+            "PRINCIPAL",
+        )
     }
 }
 
