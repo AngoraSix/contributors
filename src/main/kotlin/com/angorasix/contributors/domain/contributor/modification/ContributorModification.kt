@@ -21,7 +21,7 @@ class UpdateHeadMedia(fieldValue: ContributorMedia) :
         domainObject: Contributor,
     ): Contributor {
         require(
-            (requestingContributor.id == domainObject.id),
+            (requestingContributor.contributorId == domainObject.id),
         ) { "Can't modify headMedia field for contributor" }
         domainObject.headMedia = modifyValue
         return domainObject
@@ -35,7 +35,7 @@ class UpdateProfileMedia(fieldValue: ContributorMedia) :
         domainObject: Contributor,
     ): Contributor {
         require(
-            (requestingContributor.id == domainObject.id),
+            (requestingContributor.contributorId == domainObject.id),
         ) { "Can't modify profileMedia field for contributor" }
         domainObject.profileMedia = modifyValue
         return domainObject
