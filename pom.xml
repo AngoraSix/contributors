@@ -7,6 +7,7 @@
     <artifactId>parent-pom-spring-kotlin</artifactId>
     <groupId>com.angorasix</groupId>
     <version>0.2.0</version>
+    <relativePath>../parent-poms/parent-pom-spring-kotlin</relativePath>
   </parent>
   <artifactId>contributors</artifactId>
   <name>contributors</name>
