@@ -11,5 +11,5 @@ spring:
     name: ${A6_CONTRIBUTORS_APP_NAME:contributors}
   data:
     mongodb:
-      uri: ${A6_CONTRIBUTORS_MONGO_DB_URI:mongodb://localhost:27017/}${A6_CONTRIBUTORS_MONGO_DB_NAME:contributors/}${A6_CONTRIBUTORS_MONGO_DB_PARAMS:}
+      uri: ${A6_CONTRIBUTORS_MONGO_DB_URI:mongodb://localhost:27017/}${A6_CONTRIBUTORS_MONGO_DB_NAME:a6-contributors}${A6_CONTRIBUTORS_MONGO_DB_PARAMS:?}
 
