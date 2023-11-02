@@ -3,21 +3,27 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.angorasix</groupId>
+  <artifactId>contributors</artifactId>
+  <version>0.2.0</version>
+
   <parent>
     <artifactId>parent-pom-spring-kotlin</artifactId>
     <groupId>com.angorasix</groupId>
-    <version>0.2.0</version>
+    <version>0.2.2</version>
+    <relativePath>../parent-poms/parent-pom-spring-kotlin</relativePath>
   </parent>
-  <artifactId>contributors</artifactId>
-  <name>contributors</name>
-  <description>Contributors application handling Users and Authorization Server functionality
-  </description>
 
   <properties>
     <!-- @TODO update once Spring Cloud release supports Boot 3.1 and can sue testconainers -->
     <jacoco-coverage.class.line.min>0.00</jacoco-coverage.class.line.min>
     <jacoco-coverage.class.branch.min>0.00</jacoco-coverage.class.branch.min>
   </properties>
+
+  <name>contributors</name>
+  <description>Contributors application handling Users and Authorization Server functionality
+  </description>
 
   <dependencies>
 
@@ -58,7 +64,7 @@
     <dependency>
       <groupId>com.angorasix</groupId>
       <artifactId>commons.core</artifactId>
-      <version>0.2.4</version>
+      <version>0.2.6</version>
     </dependency>
   </dependencies>
 

@@ -14,14 +14,10 @@ import org.springframework.http.HttpMethod
 @ConfigurationProperties(prefix = "configs.api")
 data class ApiConfigs(
     @NestedConfigurationProperty
-    var headers: HeadersConfigs,
-    @NestedConfigurationProperty
     var routes: RoutesConfigs,
     @NestedConfigurationProperty
     var basePaths: BasePathConfigs,
 )
-
-data class HeadersConfigs constructor(val contributor: String)
 
 data class BasePathConfigs constructor(val contributor: String)
 
