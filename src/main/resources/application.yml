@@ -3,6 +3,15 @@ context:
     classes: com.angorasix.contributors.BeansInitializer
 server:
   port: ${A6_CONTRIBUTORS_PORT:9081}
+  forward-headers-strategy: ${A6_CONTRIBUTORS_SERVER_PROXY_STRATEGY:FRAMEWORK}
+  tomcat:
+    redirect-context-root: ${A6_CONTRIBUTORS_SERVER_PROXY_REDIRECT:false}
+
+logging:
+  level:
+    root: ${A6_CONTRIBUTORS_LOGGING_LEVEL_ROOT:INFO}
+    org.springframework.security.oauth2.server.authorization: ${A6_CONTRIBUTORS_LOGGING_LEVEL_AUTHORIZATION:INFO}
+    org.springframework.security.oauth2.client: ${A6_CONTRIBUTORS_LOGGING_LEVEL_CLIENT:INFO}
 
 spring:
   config:
@@ -11,5 +20,12 @@ spring:
     name: ${A6_CONTRIBUTORS_APP_NAME:contributors}
   data:
     mongodb:
+#      host: ${A6_CONTRIBUTORS_MONGO_DB_HOST:localhost}
+#      port: ${A6_CONTRIBUTORS_MONGO_DB_PORT:27017}
+#      database: ${A6_CONTRIBUTORS_MONGO_DB_NAME:a6-Contributors}
+#      username: ${A6_CONTRIBUTORS_MONGO_DB_USERNAME}
+#      password: ${A6_CONTRIBUTORS_MONGO_DB_PASSWORD}
       uri: ${A6_CONTRIBUTORS_MONGO_DB_URI:mongodb://localhost:27017/}${A6_CONTRIBUTORS_MONGO_DB_NAME:a6-contributors}${A6_CONTRIBUTORS_MONGO_DB_PARAMS:?}
+      ssl:
+        enabled: ${A6_CONTRIBUTORS_MONGO_DB_SSL_ENABLED:false}
 
