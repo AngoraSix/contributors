@@ -1,6 +1,7 @@
 package com.angorasix.contributors.presentation.dto
 
 import com.angorasix.commons.domain.SimpleContributor
+import com.angorasix.commons.presentation.dto.A6MediaDto
 import com.angorasix.commons.presentation.dto.PatchOperation
 import com.angorasix.commons.presentation.dto.PatchOperationSpec
 import com.angorasix.contributors.domain.contributor.ContributorMedia
@@ -22,17 +23,10 @@ data class ContributorDto(
     var email: String?,
     var firstName: String?,
     var lastName: String?,
-    val profileMedia: ContributorMediaDto?,
-    val headMedia: ContributorMediaDto?,
+    val profileMedia: A6MediaDto?,
+    val headMedia: A6MediaDto?,
     val id: String?,
 ) : RepresentationModel<ContributorDto>()
-
-data class ContributorMediaDto(
-    val mediaType: String,
-    val url: String,
-    val thumbnailUrl: String,
-    val resourceId: String,
-)
 
 enum class SupportedPatchOperations(val op: PatchOperationSpec) {
     REPLACE_HEAD_MEDIA(

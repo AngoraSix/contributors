@@ -2,7 +2,9 @@ package com.angorasix.contributors.presentation.handler
 
 import com.angorasix.commons.domain.SimpleContributor
 import com.angorasix.commons.infrastructure.constants.AngoraSixInfrastructure
+import com.angorasix.commons.presentation.dto.A6MediaDto
 import com.angorasix.commons.presentation.dto.Patch
+import com.angorasix.commons.presentation.handler.convertToDto
 import com.angorasix.commons.servlet.presentation.error.resolveNotFound
 import com.angorasix.commons.servlet.presentation.error.resolveUnauthorized
 import com.angorasix.contributors.application.ContributorService
@@ -12,7 +14,6 @@ import com.angorasix.contributors.domain.contributor.ProviderUser
 import com.angorasix.contributors.domain.contributor.modification.ContributorModification
 import com.angorasix.contributors.infrastructure.security.extractProviderUser
 import com.angorasix.contributors.presentation.dto.ContributorDto
-import com.angorasix.contributors.presentation.dto.ContributorMediaDto
 import com.angorasix.contributors.presentation.dto.SupportedPatchOperations
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.hateoas.MediaTypes
@@ -164,16 +165,7 @@ private fun ContributorDto.convertToDomain(forProviderUser: ProviderUser): Contr
     )
 }
 
-private fun ContributorMedia.convertToDto(): ContributorMediaDto {
-    return ContributorMediaDto(
-        mediaType,
-        url,
-        thumbnailUrl,
-        resourceId,
-    )
-}
-
-private fun ContributorMediaDto.convertToDomain(): ContributorMedia {
+private fun A6MediaDto.convertToDomain(): ContributorMedia {
     return ContributorMedia(
         mediaType,
         url,
