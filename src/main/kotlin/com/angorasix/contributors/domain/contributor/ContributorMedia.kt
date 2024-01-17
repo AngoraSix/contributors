@@ -1,5 +1,7 @@
 package com.angorasix.contributors.domain.contributor
 
+import com.angorasix.commons.domain.A6Media
+
 /**
  * <p>
  * </p>
@@ -7,8 +9,8 @@ package com.angorasix.contributors.domain.contributor
  * @author rozagerardo
  */
 class ContributorMedia(
-    val mediaType: String,
-    val url: String,
-    val thumbnailUrl: String,
-    val resourceId: String,
-)
+    mediaType: String,
+    url: String,
+    thumbnailUrl: String,
+    resourceId: String,
+) : A6Media(mediaType, url, thumbnailUrl, resourceId)

@@ -1,12 +1,12 @@
 package com.angorasix.contributors.integration
 
+import com.angorasix.commons.presentation.dto.A6MediaDto
 import com.angorasix.contributors.ContributorsApplication
 import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.domain.contributor.ProviderUser
 import com.angorasix.contributors.integration.utils.IntegrationProperties
 import com.angorasix.contributors.integration.utils.initializeMongodb
 import com.angorasix.contributors.presentation.dto.ContributorDto
-import com.angorasix.contributors.presentation.dto.ContributorMediaDto
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.hasItem
@@ -24,7 +24,6 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.net.URL
-import java.util.*
 
 @Disabled("Current Spring cloud release train is not compatible with required Boot 3.1")
 @SpringBootTest(
@@ -127,7 +126,7 @@ class ContributorIntegrationTest(
         "contributor@mail.com",
         "contributorFirstName",
         "contributorLastName",
-        ContributorMediaDto(
+        A6MediaDto(
             "image",
             "http://image-resource.com/123",
             "http://image-resource.com/123-thumbnail",

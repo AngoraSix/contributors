@@ -3,12 +3,12 @@ package com.angorasix.contributors.presentation.handler
 import com.angorasix.commons.domain.SimpleContributor
 import com.angorasix.commons.infrastructure.constants.AngoraSixInfrastructure
 import com.angorasix.commons.infrastructure.oauth2.constants.A6WellKnownClaims
+import com.angorasix.commons.presentation.dto.A6MediaDto
 import com.angorasix.contributors.application.ContributorService
 import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.domain.contributor.ContributorMedia
 import com.angorasix.contributors.domain.contributor.ProviderUser
 import com.angorasix.contributors.presentation.dto.ContributorDto
-import com.angorasix.contributors.presentation.dto.ContributorMediaDto
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -181,7 +181,7 @@ class ContributorHandlerUnitTest {
         "${prefix}contributorFirstName",
         "${prefix}contributorLastName",
         if (withProfileMedia) {
-            ContributorMediaDto(
+            A6MediaDto(
                 "image",
                 "http://image-profile.com/123",
                 "http://image-profile.com/123-thumbnail",
@@ -191,7 +191,7 @@ class ContributorHandlerUnitTest {
             null
         },
         if (withHeadMedia) {
-            ContributorMediaDto(
+            A6MediaDto(
                 "image",
                 "http://image-head.com/456",
                 "http://image-head.com/456-thumbnail",
