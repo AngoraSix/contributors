@@ -78,7 +78,14 @@ fun tokenCustomizer(
         }
         if (OAuth2TokenType.ACCESS_TOKEN == context.tokenType) {
             context.claims.claims { claims ->
-                claims.putAll(arrayOf(A6WellKnownClaims.CONTRIBUTOR_ID to contributor?.id))
+                claims.putAll(
+                    arrayOf(
+                        A6WellKnownClaims.CONTRIBUTOR_ID to contributor?.id,
+                        StandardClaimNames.NAME to (contributor?.firstName
+                            ?: contributor?.lastName),
+                        StandardClaimNames.PICTURE to (contributor?.profileMedia?.url)
+                    ),
+                )
             }
         }
     }
