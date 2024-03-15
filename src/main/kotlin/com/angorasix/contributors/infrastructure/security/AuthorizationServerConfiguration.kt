@@ -43,11 +43,10 @@ fun authorizationServerSecurityFilterChain(
     http // Redirect to the OAuth 2.0 Login endpoint when not authenticated
         // from the authorization endpoint
         .exceptionHandling { exceptions ->
-            exceptions
-                .defaultAuthenticationEntryPointFor(
-                    LoginUrlAuthenticationEntryPoint("/oauth2/authorization/google"),
-                    MediaTypeRequestMatcher(MediaType.TEXT_HTML),
-                )
+            exceptions.defaultAuthenticationEntryPointFor(
+                LoginUrlAuthenticationEntryPoint("/oauth2/authorization/google"),
+                MediaTypeRequestMatcher(MediaType.TEXT_HTML),
+            )
         } // Accept access tokens for User Info and/or Client Registration
         .oauth2ResourceServer { oauth2 -> oauth2.jwt(Customizer.withDefaults()) }
     return http.build()
@@ -81,9 +80,11 @@ fun tokenCustomizer(
                 claims.putAll(
                     arrayOf(
                         A6WellKnownClaims.CONTRIBUTOR_ID to contributor?.id,
-                        StandardClaimNames.NAME to (contributor?.firstName
-                            ?: contributor?.lastName),
-                        StandardClaimNames.PICTURE to (contributor?.profileMedia?.url)
+                        StandardClaimNames.NAME to (
+                            contributor?.firstName
+                                ?: contributor?.lastName
+                            ),
+                        StandardClaimNames.PICTURE to (contributor?.profileMedia?.url),
                     ),
                 )
             }
