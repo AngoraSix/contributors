@@ -14,7 +14,8 @@ spring:
                 - authorization_code
                 - refresh_token
               redirect-uris:
-                - ${A6_CONTRIBUTORS_AUTHZ_REDIRECT_URI:http://localhost:9090/api/auth/callback/angorasixspring}
+                - ${A6_CONTRIBUTORS_AN_AUTHZ_REDIRECT_URI:http://localhost:9090/api/auth/callback/angorasixspring}
+                - ${A6_CONTRIBUTORS_A6_AUTHZ_REDIRECT_URI:http://localhost:7070/api/auth/callback/angorasixspring}
               scopes:
                 - openid
                 - profile
