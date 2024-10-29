@@ -2,7 +2,7 @@ context:
   initializer:
     classes: com.angorasix.contributors.BeansInitializer
 server:
-  port: ${A6_CONTRIBUTORS_PORT:9081}
+  port: ${A6_CONTRIBUTORS_PORT:10100}
   forward-headers-strategy: ${A6_CONTRIBUTORS_SERVER_PROXY_STRATEGY:FRAMEWORK}
   tomcat:
     redirect-context-root: ${A6_CONTRIBUTORS_SERVER_PROXY_REDIRECT:false}

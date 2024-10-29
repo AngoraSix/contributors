@@ -1,2 +1,2 @@
 ## OAuth Discovery Endpoint
-http://localhost:9081/.well-known/openid-configuration
+http://localhost:10100/.well-known/openid-configuration
