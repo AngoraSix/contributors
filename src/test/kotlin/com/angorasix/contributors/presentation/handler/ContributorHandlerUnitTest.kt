@@ -70,7 +70,7 @@ class ContributorHandlerUnitTest {
             every {
                 service.checkContributor(
                     "cid-123",
-                    ProviderUser(URL("http://localhost:9081"), "sub-123"),
+                    ProviderUser(URL("http://localhost:10100"), "sub-123"),
                 )
             } returns existingContributor
             every {
@@ -95,7 +95,7 @@ class ContributorHandlerUnitTest {
             verify {
                 service.checkContributor(
                     "cid-123",
-                    ProviderUser(URL("http://localhost:9081"), "sub-123"),
+                    ProviderUser(URL("http://localhost:10100"), "sub-123"),
                 )
             }
             verify {
@@ -217,7 +217,7 @@ class ContributorHandlerUnitTest {
         )
         val jwt: Jwt =
             Jwt.withTokenValue("tokenValue").expiresAt(Instant.now().plusSeconds(5000))
-                .issuer("http://localhost:9081")
+                .issuer("http://localhost:10100")
                 .subject("sub-123")
                 .header("alg", "ger")
                 .claim(A6WellKnownClaims.CONTRIBUTOR_ID, "contributorIdValue").build()
