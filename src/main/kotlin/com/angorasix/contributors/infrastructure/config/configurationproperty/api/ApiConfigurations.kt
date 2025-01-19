@@ -27,6 +27,7 @@ data class RoutesConfigs constructor(
     val getContributor: Route,
 //    val updateContributor: Route,
     val patchContributor: Route,
+    val listContributors: Route,
 )
 
 data class Route(
