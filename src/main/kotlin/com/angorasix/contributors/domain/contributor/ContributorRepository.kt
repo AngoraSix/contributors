@@ -1,5 +1,6 @@
 package com.angorasix.contributors.domain.contributor
 
+import com.angorasix.contributors.infrastructure.persistence.repository.ContributorFilterRepository
 import org.springframework.data.repository.CrudRepository
 
 /**
@@ -8,8 +9,9 @@ import org.springframework.data.repository.CrudRepository
  *
  * @author rozagerardo
  */
-interface ContributorRepository : CrudRepository<Contributor, String> {
+interface ContributorRepository :
+    CrudRepository<Contributor, String>,
+    ContributorFilterRepository{
     fun findByEmail(email: String): Contributor?
-
     fun findDistinctByProviderUsers(providerUser: ProviderUser): Contributor?
 }

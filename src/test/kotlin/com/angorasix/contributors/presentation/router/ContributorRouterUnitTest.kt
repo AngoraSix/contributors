@@ -34,6 +34,7 @@ class ContributorRouterUnitTest {
         "/{id}",
         Route("mocked-get-single", listOf("mocked-base1"), HttpMethod.GET, "/{id}"),
         Route("mocked-modify", listOf("mocked-base1"), HttpMethod.PATCH, "/{id}"),
+        Route("mocked-list", listOf("mocked-base1"), HttpMethod.GET, "/"),
     )
     private var basePathsConfigs: BasePathConfigs = BasePathConfigs("/contributors")
 

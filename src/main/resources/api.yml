@@ -24,6 +24,12 @@ configs:
           - ${configs.api.basePaths.contributor}
         method: PATCH
         path: ${configs.api.routes.baseByIdCrudRoute}
+      listContributors:
+        name: listContributors
+        basePaths:
+          - ${configs.api.basePaths.contributor}
+        method: GET
+        path: ${configs.api.routes.baseCrudRoute}
 
 #      baseListCrudRoute: ""
 #      baseByIdCrudRoute: "/{id}"
