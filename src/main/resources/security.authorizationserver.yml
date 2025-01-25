@@ -16,6 +16,7 @@ spring:
               redirect-uris:
                 - ${A6_CONTRIBUTORS_AN_AUTHZ_REDIRECT_URI:http://localhost:10701/api/auth/callback/angorasixspring}
                 - ${A6_CONTRIBUTORS_A6_AUTHZ_REDIRECT_URI:http://localhost:10700/api/auth/callback/angorasixspring}
+                - ${A6_CONTRIBUTORS_COOPERATIVEMOS_AUTHZ_REDIRECT_URI:http://localhost:10702/api/auth/callback/angorasixspring}
               scopes:
                 - openid
                 - profile
