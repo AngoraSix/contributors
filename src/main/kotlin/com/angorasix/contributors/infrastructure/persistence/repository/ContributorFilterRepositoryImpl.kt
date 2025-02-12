@@ -28,7 +28,10 @@ class ContributorFilterRepositoryImpl(private val mongoOps: MongoOperations) :
 private fun ListContributorsFilter.toQuery(): Query {
     val query = Query()
 
-    query.addCriteria(where("id").`in`(id))
-
+    if (!id.isNullOrEmpty()) {
+        query.addCriteria(where("_id").`in`(*id.toTypedArray()))
+    } else {
+        query.addCriteria(where("_id").`in`(emptyList<String>()))
+    }
     return query
 }

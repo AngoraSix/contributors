@@ -25,7 +25,7 @@ class ContributorService(private val repository: ContributorRepository) {
     fun persistNewLoginContributor(
         providerUser: ProviderUser,
         contributor: Contributor,
-    ): Contributor? {
+    ): Contributor {
         val existingProviderContributor = repository.findDistinctByProviderUsers(providerUser)
         if (existingProviderContributor == null) {
             val existingContributor = contributor.email?.let { repository.findByEmail(it) }
