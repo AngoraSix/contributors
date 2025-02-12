@@ -5,7 +5,9 @@ import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.domain.contributor.ContributorRepository
 import com.angorasix.contributors.domain.contributor.ProviderUser
 import com.angorasix.contributors.domain.contributor.modification.ContributorModification
+import com.angorasix.contributors.infrastructure.queryfilters.ListContributorsFilter
 import org.springframework.data.repository.findByIdOrNull
+import reactor.core.publisher.Flux
 
 /**
  *
@@ -23,7 +25,7 @@ class ContributorService(private val repository: ContributorRepository) {
     fun persistNewLoginContributor(
         providerUser: ProviderUser,
         contributor: Contributor,
-    ): Contributor? {
+    ): Contributor {
         val existingProviderContributor = repository.findDistinctByProviderUsers(providerUser)
         if (existingProviderContributor == null) {
             val existingContributor = contributor.email?.let { repository.findByEmail(it) }
@@ -45,7 +47,7 @@ class ContributorService(private val repository: ContributorRepository) {
     fun updateContributor(
         contributorToUpdate: Contributor,
         updateData: Contributor,
-    ): Contributor? = contributorToUpdate.updateWithData(updateData).let { repository.save(it) }
+    ): Contributor = contributorToUpdate.updateWithData(updateData).let { repository.save(it) }
 
     fun modifyContributor(
         requestingContributor: SimpleContributor,
@@ -63,6 +65,15 @@ class ContributorService(private val repository: ContributorRepository) {
         }
         return updatedContributor?.let { repository.save(it) }
     }
+
+    /**
+     * Method to retrieve a collection of [Contributor]s.
+     *
+     * @return [Flux] of [Contributor]
+     */
+    fun findContributors(
+        filter: ListContributorsFilter,
+    ): List<Contributor> = repository.findUsingFilter(filter)
 
     private fun Contributor.updateWithData(other: Contributor): Contributor {
         other.firstName?.let { this.firstName = it }

@@ -43,6 +43,14 @@ class ContributorRouter(
                     )
                 }
             }
+            apiConfigs.routes.baseCrudRoute.nest {
+                method(apiConfigs.routes.listContributors.method).nest {
+                    method(
+                        apiConfigs.routes.listContributors.method,
+                        handler::listContributors,
+                    )
+                }
+            }
         }
     }
 }

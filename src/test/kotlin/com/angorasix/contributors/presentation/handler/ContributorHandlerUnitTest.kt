@@ -29,6 +29,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.servlet.function.EntityResponse
 import org.springframework.web.servlet.function.RouterFunctions
 import org.springframework.web.servlet.function.ServerRequest.create
+import java.net.URI
 import java.net.URL
 import java.time.Instant
 
@@ -89,7 +90,7 @@ class ContributorHandlerUnitTest {
             assertThat(responseBody).isNotSameAs(mockedContributorDto)
             assertThat(responseBody.firstName).isEqualTo("contributorFirstName")
             assertThat(responseBody.lastName).isEqualTo("contributorLastName")
-            assertThat(responseBody.email).isEqualTo("contributor@mail.com")
+            assertThat(responseBody.email).isNull()
             assertThat(responseBody.headMedia?.url).isNull()
             assertThat(responseBody.profileMedia?.url).isEqualTo("http://image-profile.com/123")
             verify {
@@ -108,7 +109,7 @@ class ContributorHandlerUnitTest {
 
     @Test
     @Throws(Exception::class)
-    fun `When get project - Then handler retrieves resource`() =
+    fun `When get contributor - Then handler retrieves resource`() =
         run {
             val mockedRequest = mockHttpServletRequest()
             val existingContributor = generateContributor()
@@ -130,7 +131,7 @@ class ContributorHandlerUnitTest {
             outputResponse as EntityResponse<ContributorDto>
             val responseBody = response.entity()
             assertThat(responseBody.providerUsers.toList()).asList().isEmpty()
-            assertThat(responseBody.email).isEqualTo("contributor@mail.com")
+            assertThat(responseBody.email).isNull() // email is sensitive information
             assertThat(responseBody.firstName).isEqualTo("contributorFirstName")
             assertThat(responseBody.lastName).isEqualTo("contributorLastName")
             verify {
@@ -145,7 +146,7 @@ class ContributorHandlerUnitTest {
         withProfileMedia: Boolean = true,
         withHeadMedia: Boolean = false,
     ): Contributor = Contributor(
-        ProviderUser(URL("http://issuer.com"), "${prefix}subject123"),
+        ProviderUser(URI("http://issuer.com").toURL(), "${prefix}subject123"),
         "${prefix}contributor@mail.com",
         "${prefix}contributorFirstName",
         "${prefix}contributorLastName",

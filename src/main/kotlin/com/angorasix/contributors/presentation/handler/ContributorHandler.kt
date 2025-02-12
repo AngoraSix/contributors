@@ -12,13 +12,17 @@ import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.domain.contributor.ContributorMedia
 import com.angorasix.contributors.domain.contributor.ProviderUser
 import com.angorasix.contributors.domain.contributor.modification.ContributorModification
+import com.angorasix.contributors.infrastructure.queryfilters.ListContributorsFilter
 import com.angorasix.contributors.infrastructure.security.extractProviderUser
 import com.angorasix.contributors.presentation.dto.ContributorDto
+import com.angorasix.contributors.presentation.dto.ContributorQueryParams
 import com.angorasix.contributors.presentation.dto.SupportedPatchOperations
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.hateoas.MediaTypes
+import org.springframework.util.MultiValueMap
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
+import org.springframework.web.servlet.function.ServerResponse.ok
 import org.springframework.web.servlet.function.principalOrNull
 
 /**
@@ -118,7 +122,7 @@ class ContributorHandler(
                     service.updateContributor(it, updateContributorData)
                         ?.convertToDto(providerUser)
                 contributor?.let {
-                    return ServerResponse.ok().contentType(MediaTypes.HAL_FORMS_JSON)
+                    return ok().contentType(MediaTypes.HAL_FORMS_JSON)
                         .body(it)
                 }
             } ?: resolveUnauthorized(
@@ -129,6 +133,22 @@ class ContributorHandler(
             "Update Contributor endpoint can't determine authentication principal",
             "PRINCIPAL",
         )
+    }
+
+    /**
+     * Handler for the List Contributors endpoint.
+     *
+     * @param request - HTTP `ServerRequest` object
+     * @return the `ServerResponse`
+     */
+    fun listContributors(request: ServerRequest): ServerResponse {
+        val requestingContributor =
+            request.attributes()[AngoraSixInfrastructure.REQUEST_ATTRIBUTE_CONTRIBUTOR_KEY]
+        return service.findContributors(request.params().toQueryFilter()).map {
+            it.convertToDto(requestingContributor as? SimpleContributor)
+        }.let {
+            ok().contentType(MediaTypes.HAL_FORMS_JSON).body(it)
+        }
     }
 }
 
@@ -145,7 +165,28 @@ private fun Contributor.convertToDto(
     }
     return ContributorDto(
         filteredProviderUsers,
-        email,
+        null,
+        firstName,
+        lastName,
+        profileMedia?.convertToDto(),
+        headMedia?.convertToDto(),
+        id,
+    )
+}
+
+private fun Contributor.convertToDto(
+    requestingContributor: SimpleContributor?,
+    showAllProviderUsers: Boolean = false,
+): ContributorDto {
+    val isRequestingContributor = requestingContributor?.contributorId == id
+    val filteredProviderUsers = if (isRequestingContributor && showAllProviderUsers) {
+        providerUsers
+    } else {
+        emptySet()
+    }
+    return ContributorDto(
+        filteredProviderUsers,
+        if (isRequestingContributor) email else null,
         firstName,
         lastName,
         profileMedia?.convertToDto(),
@@ -171,5 +212,15 @@ private fun A6MediaDto.convertToDomain(): ContributorMedia {
         url,
         thumbnailUrl,
         resourceId,
+    )
+}
+
+private fun MultiValueMap<String, String>.toQueryFilter(): ListContributorsFilter {
+    return ListContributorsFilter(
+        id = get(ContributorQueryParams.IDS.param)?.flatMap {
+            it.split(
+                ",",
+            )
+        },
     )
 }
