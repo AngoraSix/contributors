@@ -11,7 +11,7 @@ import org.springframework.data.repository.CrudRepository
  */
 interface ContributorRepository :
     CrudRepository<Contributor, String>,
-    ContributorFilterRepository{
+    ContributorFilterRepository {
     fun findByEmail(email: String): Contributor?
     fun findDistinctByProviderUsers(providerUser: ProviderUser): Contributor?
 }

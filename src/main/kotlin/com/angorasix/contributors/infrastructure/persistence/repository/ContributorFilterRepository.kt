@@ -2,7 +2,6 @@ package com.angorasix.contributors.infrastructure.persistence.repository
 
 import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.infrastructure.queryfilters.ListContributorsFilter
-import kotlinx.coroutines.flow.Flow
 
 /**
  * <p>

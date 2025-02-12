@@ -2,10 +2,7 @@ package com.angorasix.contributors.infrastructure.persistence.repository
 
 import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.infrastructure.queryfilters.ListContributorsFilter
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.reactive.asFlow
 import org.springframework.data.mongodb.core.MongoOperations
-import org.springframework.data.mongodb.core.ReactiveMongoOperations
 import org.springframework.data.mongodb.core.query.Criteria.where
 import org.springframework.data.mongodb.core.query.Query
 
@@ -29,7 +26,7 @@ private fun ListContributorsFilter.toQuery(): Query {
     val query = Query()
 
     if (!id.isNullOrEmpty()) {
-        query.addCriteria(where("_id").`in`(*id.toTypedArray()))
+        query.addCriteria(where("_id").`in`(id as Collection<Any>))
     } else {
         query.addCriteria(where("_id").`in`(emptyList<String>()))
     }

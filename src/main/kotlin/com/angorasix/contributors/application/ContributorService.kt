@@ -66,7 +66,6 @@ class ContributorService(private val repository: ContributorRepository) {
         return updatedContributor?.let { repository.save(it) }
     }
 
-
     /**
      * Method to retrieve a collection of [Contributor]s.
      *
