@@ -1,6 +1,6 @@
 package com.angorasix.contributors.presentation.dto
 
-import com.angorasix.commons.domain.SimpleContributor
+import com.angorasix.commons.domain.A6Contributor
 import com.angorasix.commons.presentation.dto.A6MediaDto
 import com.angorasix.commons.presentation.dto.PatchOperation
 import com.angorasix.commons.presentation.dto.PatchOperationSpec
@@ -28,14 +28,16 @@ data class ContributorDto(
     val id: String?,
 ) : RepresentationModel<ContributorDto>()
 
-enum class SupportedPatchOperations(val op: PatchOperationSpec) {
+enum class SupportedPatchOperations(
+    val op: PatchOperationSpec,
+) {
     REPLACE_HEAD_MEDIA(
         object : PatchOperationSpec {
             override fun supportsPatchOperation(operation: PatchOperation): Boolean =
                 operation.op == "replace" && operation.path == "/headMedia"
 
             override fun mapToObjectModification(
-                contributor: SimpleContributor,
+                contributor: A6Contributor,
                 operation: PatchOperation,
                 objectMapper: ObjectMapper,
             ): ContributorModification<ContributorMedia> {
@@ -51,7 +53,7 @@ enum class SupportedPatchOperations(val op: PatchOperationSpec) {
                 operation.op == "replace" && operation.path == "/profileMedia"
 
             override fun mapToObjectModification(
-                contributor: SimpleContributor,
+                contributor: A6Contributor,
                 operation: PatchOperation,
                 objectMapper: ObjectMapper,
             ): ContributorModification<ContributorMedia> {
@@ -61,5 +63,4 @@ enum class SupportedPatchOperations(val op: PatchOperationSpec) {
             }
         },
     ),
-    ;
 }

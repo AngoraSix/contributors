@@ -1,6 +1,6 @@
 package com.angorasix.contributors.presentation.handler
 
-import com.angorasix.commons.domain.SimpleContributor
+import com.angorasix.commons.domain.A6Contributor
 import com.angorasix.commons.infrastructure.constants.AngoraSixInfrastructure
 import com.angorasix.commons.infrastructure.oauth2.constants.A6WellKnownClaims
 import com.angorasix.commons.presentation.dto.A6MediaDto
@@ -16,6 +16,7 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
+import org.assertj.core.api.InstanceOfAssertFactories
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -30,13 +31,11 @@ import org.springframework.web.servlet.function.EntityResponse
 import org.springframework.web.servlet.function.RouterFunctions
 import org.springframework.web.servlet.function.ServerRequest.create
 import java.net.URI
-import java.net.URL
 import java.time.Instant
 
 @ExtendWith(MockKExtension::class)
 @ExperimentalCoroutinesApi
 class ContributorHandlerUnitTest {
-
     private lateinit var handler: ContributorHandler
 
     @MockK
@@ -53,11 +52,12 @@ class ContributorHandlerUnitTest {
     @Throws(Exception::class)
     fun `When update contributor - Then handler retrieves Updated`() =
         run {
-            val mockedContributorDto = generateContributorDto(
-                "updated",
-                withProfileMedia = false,
-                withHeadMedia = true,
-            )
+            val mockedContributorDto =
+                generateContributorDto(
+                    "updated",
+                    withProfileMedia = false,
+                    withHeadMedia = true,
+                )
             val mockedRequest = mockHttpServletRequest()
             mockedRequest.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             mockedRequest.setContent(objectMapper.writeValueAsBytes(mockedContributorDto))
@@ -71,7 +71,7 @@ class ContributorHandlerUnitTest {
             every {
                 service.checkContributor(
                     "cid-123",
-                    ProviderUser(URL("http://localhost:10100"), "sub-123"),
+                    ProviderUser(URI("http://localhost:10100").toURL(), "sub-123"),
                 )
             } returns existingContributor
             every {
@@ -84,8 +84,10 @@ class ContributorHandlerUnitTest {
             val outputResponse = handler.updateContributor(updateSingleContributorRequest)
 
             assertThat(outputResponse.statusCode()).isEqualTo(HttpStatus.OK)
-            val response = @Suppress("UNCHECKED_CAST")
-            outputResponse as EntityResponse<ContributorDto>
+            val response =
+                @Suppress("UNCHECKED_CAST")
+                outputResponse
+                    as EntityResponse<ContributorDto>
             val responseBody = response.entity()
             assertThat(responseBody).isNotSameAs(mockedContributorDto)
             assertThat(responseBody.firstName).isEqualTo("contributorFirstName")
@@ -96,7 +98,7 @@ class ContributorHandlerUnitTest {
             verify {
                 service.checkContributor(
                     "cid-123",
-                    ProviderUser(URL("http://localhost:10100"), "sub-123"),
+                    ProviderUser(URI("http://localhost:10100").toURL(), "sub-123"),
                 )
             }
             verify {
@@ -127,10 +129,14 @@ class ContributorHandlerUnitTest {
             val outputResponse = handler.getContributor(getSingleContributorRequest)
 
             assertThat(outputResponse.statusCode()).isEqualTo(HttpStatus.OK)
-            val response = @Suppress("UNCHECKED_CAST")
-            outputResponse as EntityResponse<ContributorDto>
+            val response =
+                @Suppress("UNCHECKED_CAST")
+                outputResponse
+                    as EntityResponse<ContributorDto>
             val responseBody = response.entity()
-            assertThat(responseBody.providerUsers.toList()).asList().isEmpty()
+            assertThat(responseBody.providerUsers.toList())
+                .asInstanceOf(InstanceOfAssertFactories.LIST)
+                .isEmpty()
             assertThat(responseBody.email).isNull() // email is sensitive information
             assertThat(responseBody.firstName).isEqualTo("contributorFirstName")
             assertThat(responseBody.lastName).isEqualTo("contributorLastName")
@@ -145,68 +151,70 @@ class ContributorHandlerUnitTest {
         prefix: String? = "",
         withProfileMedia: Boolean = true,
         withHeadMedia: Boolean = false,
-    ): Contributor = Contributor(
-        ProviderUser(URI("http://issuer.com").toURL(), "${prefix}subject123"),
-        "${prefix}contributor@mail.com",
-        "${prefix}contributorFirstName",
-        "${prefix}contributorLastName",
-        if (withProfileMedia) {
-            ContributorMedia(
-                "image",
-                "http://image-profile.com/123",
-                "http://image-profile.com/123-thumbnail",
-                "123",
-            )
-        } else {
-            null
-        },
-        if (withHeadMedia) {
-            ContributorMedia(
-                "image",
-                "http://image-head.com/456",
-                "http://image-head.com/456-thumbnail",
-                "456",
-            )
-        } else {
-            null
-        },
-    )
+    ): Contributor =
+        Contributor(
+            ProviderUser(URI("http://issuer.com").toURL(), "${prefix}subject123"),
+            "${prefix}contributor@mail.com",
+            "${prefix}contributorFirstName",
+            "${prefix}contributorLastName",
+            if (withProfileMedia) {
+                ContributorMedia(
+                    "image",
+                    "http://image-profile.com/123",
+                    "http://image-profile.com/123-thumbnail",
+                    "123",
+                )
+            } else {
+                null
+            },
+            if (withHeadMedia) {
+                ContributorMedia(
+                    "image",
+                    "http://image-head.com/456",
+                    "http://image-head.com/456-thumbnail",
+                    "456",
+                )
+            } else {
+                null
+            },
+        )
 
     private fun generateContributorDto(
         prefix: String? = "",
         withProfileMedia: Boolean = true,
         withHeadMedia: Boolean = false,
-    ): ContributorDto = ContributorDto(
-        setOf(ProviderUser(URL("http://issuer.com"), "${prefix}subject123")),
-        "${prefix}contributor@mail.com",
-        "${prefix}contributorFirstName",
-        "${prefix}contributorLastName",
-        if (withProfileMedia) {
-            A6MediaDto(
-                "image",
-                "http://image-profile.com/123",
-                "http://image-profile.com/123-thumbnail",
-                "123",
-            )
-        } else {
-            null
-        },
-        if (withHeadMedia) {
-            A6MediaDto(
-                "image",
-                "http://image-head.com/456",
-                "http://image-head.com/456-thumbnail",
-                "456",
-            )
-        } else {
-            null
-        },
-        "${prefix}cid",
-    )
+    ): ContributorDto =
+        ContributorDto(
+            setOf(ProviderUser(URI("http://issuer.com").toURL(), "${prefix}subject123")),
+            "${prefix}contributor@mail.com",
+            "${prefix}contributorFirstName",
+            "${prefix}contributorLastName",
+            if (withProfileMedia) {
+                A6MediaDto(
+                    "image",
+                    "http://image-profile.com/123",
+                    "http://image-profile.com/123-thumbnail",
+                    "123",
+                )
+            } else {
+                null
+            },
+            if (withHeadMedia) {
+                A6MediaDto(
+                    "image",
+                    "http://image-head.com/456",
+                    "http://image-head.com/456-thumbnail",
+                    "456",
+                )
+            } else {
+                null
+            },
+            "${prefix}cid",
+        )
 
     private fun mockHttpServletRequest(): MockHttpServletRequest {
         val mockedRequest = MockHttpServletRequest("PUT", "/contributors/123")
-        val mockedSimpleContributor = SimpleContributor("mockedId")
+        val mockedA6Contributor = A6Contributor("mockedId")
         val pathVariables = mapOf("id" to "cid-123")
         mockedRequest.setAttribute(
             RouterFunctions.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
@@ -214,14 +222,17 @@ class ContributorHandlerUnitTest {
         )
         mockedRequest.setAttribute(
             AngoraSixInfrastructure.REQUEST_ATTRIBUTE_CONTRIBUTOR_KEY,
-            mockedSimpleContributor,
+            mockedA6Contributor,
         )
         val jwt: Jwt =
-            Jwt.withTokenValue("tokenValue").expiresAt(Instant.now().plusSeconds(5000))
+            Jwt
+                .withTokenValue("tokenValue")
+                .expiresAt(Instant.now().plusSeconds(5000))
                 .issuer("http://localhost:10100")
                 .subject("sub-123")
                 .header("alg", "ger")
-                .claim(A6WellKnownClaims.CONTRIBUTOR_ID, "contributorIdValue").build()
+                .claim(A6WellKnownClaims.CONTRIBUTOR_ID, "contributorIdValue")
+                .build()
         mockedRequest.userPrincipal = JwtAuthenticationToken(jwt)
         return mockedRequest
     }

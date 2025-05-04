@@ -1,6 +1,6 @@
 package com.angorasix.contributors.application
 
-import com.angorasix.commons.domain.SimpleContributor
+import com.angorasix.commons.domain.A6Contributor
 import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.domain.contributor.ContributorRepository
 import com.angorasix.contributors.domain.contributor.ProviderUser
@@ -14,13 +14,12 @@ import reactor.core.publisher.Flux
  *
  * @author rozagerardo
  */
-class ContributorService(private val repository: ContributorRepository) {
+class ContributorService(
+    private val repository: ContributorRepository,
+) {
+    fun findSingleContributor(providerUser: ProviderUser): Contributor? = repository.findDistinctByProviderUsers(providerUser)
 
-    fun findSingleContributor(providerUser: ProviderUser): Contributor? =
-        repository.findDistinctByProviderUsers(providerUser)
-
-    fun findSingleContributor(contributorId: String): Contributor? =
-        repository.findByIdOrNull(contributorId)
+    fun findSingleContributor(contributorId: String): Contributor? = repository.findByIdOrNull(contributorId)
 
     fun persistNewLoginContributor(
         providerUser: ProviderUser,
@@ -29,10 +28,11 @@ class ContributorService(private val repository: ContributorRepository) {
         val existingProviderContributor = repository.findDistinctByProviderUsers(providerUser)
         if (existingProviderContributor == null) {
             val existingContributor = contributor.email?.let { repository.findByEmail(it) }
-            val mergedContributor = existingContributor?.let {
-                it.mergeProviderUser(providerUser, contributor)
-                it
-            } ?: contributor
+            val mergedContributor =
+                existingContributor?.let {
+                    it.mergeProviderUser(providerUser, contributor)
+                    it
+                } ?: contributor
             return repository.save(mergedContributor)
         }
         return existingProviderContributor
@@ -41,8 +41,7 @@ class ContributorService(private val repository: ContributorRepository) {
     fun checkContributor(
         contributorId: String,
         providerUser: ProviderUser,
-    ): Contributor? =
-        repository.findDistinctByProviderUsers(providerUser).takeIf { it?.id == contributorId }
+    ): Contributor? = repository.findDistinctByProviderUsers(providerUser).takeIf { it?.id == contributorId }
 
     fun updateContributor(
         contributorToUpdate: Contributor,
@@ -50,19 +49,20 @@ class ContributorService(private val repository: ContributorRepository) {
     ): Contributor = contributorToUpdate.updateWithData(updateData).let { repository.save(it) }
 
     fun modifyContributor(
-        requestingContributor: SimpleContributor,
+        requestingContributor: A6Contributor,
         id: String,
         modificationOperations: List<ContributorModification<out Any>>,
     ): Contributor? {
         val contributor = repository.findByIdOrNull(id)
-        val updatedContributor = contributor?.let {
-            modificationOperations.fold(it) { accumulatedContributor, op ->
-                op.modify(
-                    requestingContributor,
-                    accumulatedContributor,
-                )
+        val updatedContributor =
+            contributor?.let {
+                modificationOperations.fold(it) { accumulatedContributor, op ->
+                    op.modify(
+                        requestingContributor,
+                        accumulatedContributor,
+                    )
+                }
             }
-        }
         return updatedContributor?.let { repository.save(it) }
     }
 
@@ -71,9 +71,7 @@ class ContributorService(private val repository: ContributorRepository) {
      *
      * @return [Flux] of [Contributor]
      */
-    fun findContributors(
-        filter: ListContributorsFilter,
-    ): List<Contributor> = repository.findUsingFilter(filter)
+    fun findContributors(filter: ListContributorsFilter): List<Contributor> = repository.findUsingFilter(filter)
 
     private fun Contributor.updateWithData(other: Contributor): Contributor {
         other.firstName?.let { this.firstName = it }

@@ -1,6 +1,6 @@
 package com.angorasix.contributors.domain.contributor.modification
 
-import com.angorasix.commons.domain.SimpleContributor
+import com.angorasix.commons.domain.A6Contributor
 import com.angorasix.commons.domain.modification.DomainObjectModification
 import com.angorasix.contributors.domain.contributor.Contributor
 import com.angorasix.contributors.domain.contributor.ContributorMedia
@@ -11,13 +11,15 @@ import com.angorasix.contributors.domain.contributor.ContributorMedia
  *
  * @author rozagerardo
  */
-abstract class ContributorModification<U>(modifyValue: U) :
-    DomainObjectModification<Contributor, U>(modifyValue)
+abstract class ContributorModification<U>(
+    modifyValue: U,
+) : DomainObjectModification<Contributor, U>(modifyValue)
 
-class UpdateHeadMedia(fieldValue: ContributorMedia) :
-    ContributorModification<ContributorMedia>(fieldValue) {
+class UpdateHeadMedia(
+    fieldValue: ContributorMedia,
+) : ContributorModification<ContributorMedia>(fieldValue) {
     override fun modify(
-        requestingContributor: SimpleContributor,
+        requestingContributor: A6Contributor,
         domainObject: Contributor,
     ): Contributor {
         require(
@@ -28,10 +30,11 @@ class UpdateHeadMedia(fieldValue: ContributorMedia) :
     }
 }
 
-class UpdateProfileMedia(fieldValue: ContributorMedia) :
-    ContributorModification<ContributorMedia>(fieldValue) {
+class UpdateProfileMedia(
+    fieldValue: ContributorMedia,
+) : ContributorModification<ContributorMedia>(fieldValue) {
     override fun modify(
-        requestingContributor: SimpleContributor,
+        requestingContributor: A6Contributor,
         domainObject: Contributor,
     ): Contributor {
         require(

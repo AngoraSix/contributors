@@ -13,5 +13,6 @@ interface ContributorRepository :
     CrudRepository<Contributor, String>,
     ContributorFilterRepository {
     fun findByEmail(email: String): Contributor?
+
     fun findDistinctByProviderUsers(providerUser: ProviderUser): Contributor?
 }

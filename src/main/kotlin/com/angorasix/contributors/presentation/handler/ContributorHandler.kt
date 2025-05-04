@@ -1,6 +1,6 @@
 package com.angorasix.contributors.presentation.handler
 
-import com.angorasix.commons.domain.SimpleContributor
+import com.angorasix.commons.domain.A6Contributor
 import com.angorasix.commons.infrastructure.constants.AngoraSixInfrastructure
 import com.angorasix.commons.presentation.dto.A6MediaDto
 import com.angorasix.commons.presentation.dto.Patch
@@ -34,7 +34,6 @@ class ContributorHandler(
     private val service: ContributorService,
     private val objectMapper: ObjectMapper,
 ) {
-
     /**
      * Handler for the Get Single Contributor (Authenticated) endpoint,
      * retrieving the authenticated Contributor.
@@ -42,17 +41,18 @@ class ContributorHandler(
      * @param request - HTTP `ServerRequest` object
      * @return the `ServerResponse`
      */
-    fun getAuthenticatedContributor(request: ServerRequest): ServerResponse {
-        return request.principalOrNull()?.let {
+    fun getAuthenticatedContributor(request: ServerRequest): ServerResponse =
+        request.principalOrNull()?.let {
             val providerUser = extractProviderUser(it)
             val contributor =
                 service.findSingleContributor(providerUser)?.convertToDto(providerUser)
             contributor?.let {
-                ServerResponse.ok().contentType(MediaTypes.HAL_FORMS_JSON)
+                ServerResponse
+                    .ok()
+                    .contentType(MediaTypes.HAL_FORMS_JSON)
                     .body(it)
             }
         } ?: resolveNotFound("Can't find Contributor", "Contributor")
-    }
 
     /**
      * Handler for the Get Single Contributor (Authenticated) endpoint,
@@ -67,7 +67,9 @@ class ContributorHandler(
         val contributor =
             service.findSingleContributor(contributorId)?.convertToDto(requestingProviderUser)
         return contributor?.let {
-            ServerResponse.ok().contentType(MediaTypes.HAL_FORMS_JSON)
+            ServerResponse
+                .ok()
+                .contentType(MediaTypes.HAL_FORMS_JSON)
                 .body(it)
         } ?: resolveNotFound("Can't find Contributor", "Contributor")
     }
@@ -75,27 +77,32 @@ class ContributorHandler(
     fun patchContributor(request: ServerRequest): ServerResponse {
         return request.principalOrNull()?.let { principal ->
             val requestingContributor =
-                request.attributes()[AngoraSixInfrastructure.REQUEST_ATTRIBUTE_CONTRIBUTOR_KEY] as SimpleContributor
+                request.attributes()[AngoraSixInfrastructure.REQUEST_ATTRIBUTE_CONTRIBUTOR_KEY] as A6Contributor
             val contributorId = request.pathVariable("id")
             val providerUser = extractProviderUser(principal)
             val patch = request.body(Patch::class.java)
-            val modifyOperations = patch.operations.map { patchOp ->
-                patchOp.toDomainObjectModification(
-                    requestingContributor,
-                    SupportedPatchOperations.values().map { it.op }.toList(),
-                    objectMapper,
-                )
-            }
+            val modifyOperations =
+                patch.operations.map { patchOp ->
+                    patchOp.toDomainObjectModification(
+                        requestingContributor,
+                        SupportedPatchOperations.values().map { it.op }.toList(),
+                        objectMapper,
+                    )
+                }
             val modifyContributorOperations: List<ContributorModification<Any>> =
                 modifyOperations.filterIsInstance<ContributorModification<Any>>()
 
-            val updatedContributor = service.modifyContributor(
-                requestingContributor,
-                contributorId,
-                modifyContributorOperations,
-            )?.convertToDto(providerUser)
+            val updatedContributor =
+                service
+                    .modifyContributor(
+                        requestingContributor,
+                        contributorId,
+                        modifyContributorOperations,
+                    )?.convertToDto(providerUser)
             updatedContributor?.let {
-                return ServerResponse.ok().contentType(MediaTypes.HAL_FORMS_JSON)
+                return ServerResponse
+                    .ok()
+                    .contentType(MediaTypes.HAL_FORMS_JSON)
                     .body(it)
             }
         } ?: resolveUnauthorized(
@@ -119,10 +126,12 @@ class ContributorHandler(
                 val updateContributorData =
                     request.body(ContributorDto::class.java).convertToDomain(providerUser)
                 val contributor =
-                    service.updateContributor(it, updateContributorData)
+                    service
+                        .updateContributor(it, updateContributorData)
                         ?.convertToDto(providerUser)
                 contributor?.let {
-                    return ok().contentType(MediaTypes.HAL_FORMS_JSON)
+                    return ok()
+                        .contentType(MediaTypes.HAL_FORMS_JSON)
                         .body(it)
                 }
             } ?: resolveUnauthorized(
@@ -144,11 +153,13 @@ class ContributorHandler(
     fun listContributors(request: ServerRequest): ServerResponse {
         val requestingContributor =
             request.attributes()[AngoraSixInfrastructure.REQUEST_ATTRIBUTE_CONTRIBUTOR_KEY]
-        return service.findContributors(request.params().toQueryFilter()).map {
-            it.convertToDto(requestingContributor as? SimpleContributor)
-        }.let {
-            ok().contentType(MediaTypes.HAL_FORMS_JSON).body(it)
-        }
+        return service
+            .findContributors(request.params().toQueryFilter())
+            .map {
+                it.convertToDto(requestingContributor as? A6Contributor)
+            }.let {
+                ok().contentType(MediaTypes.HAL_FORMS_JSON).body(it)
+            }
     }
 }
 
@@ -156,13 +167,14 @@ private fun Contributor.convertToDto(
     requestingProvider: ProviderUser?,
     showAllProviderUsers: Boolean = false,
 ): ContributorDto {
-    val filteredProviderUsers = if (showAllProviderUsers) {
-        providerUsers
-    } else if (requestingProvider != null && providerUsers.contains(requestingProvider)) {
-        setOf(requestingProvider)
-    } else {
-        emptySet()
-    }
+    val filteredProviderUsers =
+        if (showAllProviderUsers) {
+            providerUsers
+        } else if (requestingProvider != null && providerUsers.contains(requestingProvider)) {
+            setOf(requestingProvider)
+        } else {
+            emptySet()
+        }
     return ContributorDto(
         filteredProviderUsers,
         null,
@@ -175,15 +187,16 @@ private fun Contributor.convertToDto(
 }
 
 private fun Contributor.convertToDto(
-    requestingContributor: SimpleContributor?,
+    requestingContributor: A6Contributor?,
     showAllProviderUsers: Boolean = false,
 ): ContributorDto {
     val isRequestingContributor = requestingContributor?.contributorId == id
-    val filteredProviderUsers = if (isRequestingContributor && showAllProviderUsers) {
-        providerUsers
-    } else {
-        emptySet()
-    }
+    val filteredProviderUsers =
+        if (isRequestingContributor && showAllProviderUsers) {
+            providerUsers
+        } else {
+            emptySet()
+        }
     return ContributorDto(
         filteredProviderUsers,
         if (isRequestingContributor) email else null,
@@ -195,8 +208,8 @@ private fun Contributor.convertToDto(
     )
 }
 
-private fun ContributorDto.convertToDomain(forProviderUser: ProviderUser): Contributor {
-    return Contributor(
+private fun ContributorDto.convertToDomain(forProviderUser: ProviderUser): Contributor =
+    Contributor(
         forProviderUser,
         email,
         firstName,
@@ -204,23 +217,21 @@ private fun ContributorDto.convertToDomain(forProviderUser: ProviderUser): Contr
         profileMedia?.convertToDomain(),
         headMedia?.convertToDomain(),
     )
-}
 
-private fun A6MediaDto.convertToDomain(): ContributorMedia {
-    return ContributorMedia(
+private fun A6MediaDto.convertToDomain(): ContributorMedia =
+    ContributorMedia(
         mediaType,
         url,
         thumbnailUrl,
         resourceId,
     )
-}
 
-private fun MultiValueMap<String, String>.toQueryFilter(): ListContributorsFilter {
-    return ListContributorsFilter(
-        id = get(ContributorQueryParams.IDS.param)?.flatMap {
-            it.split(
-                ",",
-            )
-        },
+private fun MultiValueMap<String, String>.toQueryFilter(): ListContributorsFilter =
+    ListContributorsFilter(
+        id =
+            get(ContributorQueryParams.IDS.param)?.flatMap {
+                it.split(
+                    ",",
+                )
+            },
     )
-}
