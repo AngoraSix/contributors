@@ -10,8 +10,5 @@ import com.angorasix.contributors.infrastructure.queryfilters.ListContributorsFi
  * @author rozagerardo
  */
 interface ContributorFilterRepository {
-
-    fun findUsingFilter(
-        filter: ListContributorsFilter,
-    ): List<Contributor>
+    fun findUsingFilter(filter: ListContributorsFilter): List<Contributor>
 }

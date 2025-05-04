@@ -19,10 +19,9 @@ data class ListContributorsFilter(
     }
 
     companion object {
-        fun fromMultiValueMap(multiMap: MultiValueMap<String, String>): ListContributorsFilter {
-            return ListContributorsFilter(
+        fun fromMultiValueMap(multiMap: MultiValueMap<String, String>): ListContributorsFilter =
+            ListContributorsFilter(
                 multiMap.getFirst("id")?.split(","),
             )
-        }
     }
 }

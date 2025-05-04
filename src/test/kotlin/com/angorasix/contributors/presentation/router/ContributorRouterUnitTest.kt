@@ -20,7 +20,6 @@ import org.springframework.web.servlet.function.ServerResponse
 
 @ExtendWith(MockKExtension::class)
 class ContributorRouterUnitTest {
-
     private lateinit var router: ContributorRouter
 
     @MockK
@@ -29,13 +28,14 @@ class ContributorRouterUnitTest {
     @MockK
     private lateinit var handler: ContributorHandler
 
-    private var routeConfigs: RoutesConfigs = RoutesConfigs(
-        "",
-        "/{id}",
-        Route("mocked-get-single", listOf("mocked-base1"), HttpMethod.GET, "/{id}"),
-        Route("mocked-modify", listOf("mocked-base1"), HttpMethod.PATCH, "/{id}"),
-        Route("mocked-list", listOf("mocked-base1"), HttpMethod.GET, "/"),
-    )
+    private var routeConfigs: RoutesConfigs =
+        RoutesConfigs(
+            "",
+            "/{id}",
+            Route("mocked-get-single", listOf("mocked-base1"), HttpMethod.GET, "/{id}"),
+            Route("mocked-modify", listOf("mocked-base1"), HttpMethod.PATCH, "/{id}"),
+            Route("mocked-list", listOf("mocked-base1"), HttpMethod.GET, "/"),
+        )
     private var basePathsConfigs: BasePathConfigs = BasePathConfigs("/contributors")
 
     @BeforeEach

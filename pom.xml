@@ -6,13 +6,12 @@
 
   <groupId>com.angorasix</groupId>
   <artifactId>contributors</artifactId>
-  <version>0.2.2</version>
+  <version>0.3.0</version>
 
   <parent>
     <artifactId>parent-pom-spring-kotlin</artifactId>
     <groupId>com.angorasix</groupId>
-    <version>0.2.2</version>
-    <relativePath>../parent-poms/parent-pom-spring-kotlin</relativePath>
+    <version>0.3.6</version>
   </parent>
 
   <properties>
@@ -64,7 +63,7 @@
     <dependency>
       <groupId>com.angorasix</groupId>
       <artifactId>commons.core</artifactId>
-      <version>0.2.7</version>
+      <version>0.3.5</version>
     </dependency>
   </dependencies>
 

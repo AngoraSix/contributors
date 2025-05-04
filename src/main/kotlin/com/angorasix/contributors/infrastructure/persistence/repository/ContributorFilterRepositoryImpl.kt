@@ -12,14 +12,11 @@ import org.springframework.data.mongodb.core.query.Query
  *
  * @author rozagerardo
  */
-class ContributorFilterRepositoryImpl(private val mongoOps: MongoOperations) :
-    ContributorFilterRepository {
-
-    override fun findUsingFilter(
-        filter: ListContributorsFilter,
-    ): List<Contributor> {
-        return mongoOps.find(filter.toQuery(), Contributor::class.java)
-    }
+class ContributorFilterRepositoryImpl(
+    private val mongoOps: MongoOperations,
+) : ContributorFilterRepository {
+    override fun findUsingFilter(filter: ListContributorsFilter): List<Contributor> =
+        mongoOps.find(filter.toQuery(), Contributor::class.java)
 }
 
 private fun ListContributorsFilter.toQuery(): Query {

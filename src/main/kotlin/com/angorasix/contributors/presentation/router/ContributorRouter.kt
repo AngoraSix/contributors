@@ -15,42 +15,42 @@ class ContributorRouter(
     private val handler: ContributorHandler,
     private val apiConfigs: ApiConfigs,
 ) {
-
     /**
      * Main RouterFunction configuration for all endpoints related to Contributors.
      *
      * @return the [RouterFunction] with all the routes for Contributors
      */
-    fun projectRouterFunction() = router {
-        apiConfigs.basePaths.contributor.nest {
-            filter { request, next ->
-                extractRequestingContributor(
-                    request,
-                    next,
-                )
-            }
-            apiConfigs.routes.baseByIdCrudRoute.nest {
-                method(apiConfigs.routes.getContributor.method).nest {
-                    method(
-                        apiConfigs.routes.getContributor.method,
-                        handler::getContributor,
+    fun projectRouterFunction() =
+        router {
+            apiConfigs.basePaths.contributor.nest {
+                filter { request, next ->
+                    extractRequestingContributor(
+                        request,
+                        next,
                     )
                 }
-                method(apiConfigs.routes.patchContributor.method).nest {
-                    method(
-                        apiConfigs.routes.patchContributor.method,
-                        handler::patchContributor,
-                    )
+                apiConfigs.routes.baseByIdCrudRoute.nest {
+                    method(apiConfigs.routes.getContributor.method).nest {
+                        method(
+                            apiConfigs.routes.getContributor.method,
+                            handler::getContributor,
+                        )
+                    }
+                    method(apiConfigs.routes.patchContributor.method).nest {
+                        method(
+                            apiConfigs.routes.patchContributor.method,
+                            handler::patchContributor,
+                        )
+                    }
                 }
-            }
-            apiConfigs.routes.baseCrudRoute.nest {
-                method(apiConfigs.routes.listContributors.method).nest {
-                    method(
-                        apiConfigs.routes.listContributors.method,
-                        handler::listContributors,
-                    )
+                apiConfigs.routes.baseCrudRoute.nest {
+                    method(apiConfigs.routes.listContributors.method).nest {
+                        method(
+                            apiConfigs.routes.listContributors.method,
+                            handler::listContributors,
+                        )
+                    }
                 }
             }
         }
-    }
 }

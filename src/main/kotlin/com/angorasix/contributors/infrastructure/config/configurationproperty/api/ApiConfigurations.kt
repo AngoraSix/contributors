@@ -19,7 +19,9 @@ data class ApiConfigs(
     var basePaths: BasePathConfigs,
 )
 
-data class BasePathConfigs constructor(val contributor: String)
+data class BasePathConfigs constructor(
+    val contributor: String,
+)
 
 data class RoutesConfigs constructor(
     val baseCrudRoute: String,

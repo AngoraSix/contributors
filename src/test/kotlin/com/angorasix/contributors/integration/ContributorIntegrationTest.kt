@@ -23,7 +23,7 @@ import org.springframework.hateoas.MediaTypes
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
-import java.net.URL
+import java.net.URI
 
 @Disabled("Current Spring cloud release train is not compatible with required Boot 3.1")
 @SpringBootTest(
@@ -38,31 +38,35 @@ class ContributorIntegrationTest(
     @Autowired val properties: IntegrationProperties,
     @Autowired val webTestClient: WebTestClient,
 ) {
-
     @BeforeAll
-    fun setUp() = runBlocking {
-        initializeMongodb(
-            properties.mongodb.baseJsonFile,
-            mongoTemplate,
-            mapper,
-        )
-    }
+    fun setUp() =
+        runBlocking {
+            initializeMongodb(
+                properties.mongodb.baseJsonFile,
+                mongoTemplate,
+                mapper,
+            )
+        }
 
     @Test
     fun `given base data - when retrieve Presentation by id - then existing is retrieved`() {
         val initElementQuery = Query()
         initElementQuery.addCriteria(
-            Criteria.where("referenceName")
+            Criteria
+                .where("referenceName")
                 .`is`("Project Presentation aimed to devs"),
         )
         val elementId =
             mongoTemplate.findOne(initElementQuery, Contributor::class.java)?.id
 
-        webTestClient.get()
+        webTestClient
+            .get()
             .uri("/projects-presentation/{projectPresentationId}", elementId)
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
-            .expectStatus().isOk.expectBody()
+            .expectStatus()
+            .isOk
+            .expectBody()
             .jsonPath("$.id")
             .exists()
             .jsonPath("$.projectId")
@@ -87,52 +91,67 @@ class ContributorIntegrationTest(
 
     @Test
     fun `given base data - when get non-existing Presentation - then 404 response`() {
-        webTestClient.get()
+        webTestClient
+            .get()
             .uri("/projects-presentation/non-existing-id")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
-            .expectStatus().isNotFound
+            .expectStatus()
+            .isNotFound
     }
 
     @Test
     fun `when update Contributor data - then supported fields are updated`() {
         val contributorBody = generateContributorDto()
-        webTestClient.put()
+        webTestClient
+            .put()
             .uri("/contributors/1")
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaTypes.HAL_FORMS_JSON)
             .body(
                 contributorBody,
                 ContributorDto::class.java,
-            )
-            .exchange()
-            .expectStatus().isOk.expectBody()
-            .jsonPath("$.id").exists()
-            .jsonPath("$.projectId").isEqualTo("567")
-            .jsonPath("$.referenceName").isEqualTo("newReferenceName")
-            .jsonPath("$..sections.size()").isEqualTo(1)
-            .jsonPath("$.sections[0].title").isEqualTo("introduction")
-            .jsonPath("$.sections[0].description").isEqualTo("this is a mocked project")
-            .jsonPath("$.sections[0].media.size()").isEqualTo(1)
-            .jsonPath("$.sections[0].mainMedia.mediaType").isEqualTo("video.youtube")
+            ).exchange()
+            .expectStatus()
+            .isOk
+            .expectBody()
+            .jsonPath("$.id")
+            .exists()
+            .jsonPath("$.projectId")
+            .isEqualTo("567")
+            .jsonPath("$.referenceName")
+            .isEqualTo("newReferenceName")
+            .jsonPath("$..sections.size()")
+            .isEqualTo(1)
+            .jsonPath("$.sections[0].title")
+            .isEqualTo("introduction")
+            .jsonPath("$.sections[0].description")
+            .isEqualTo("this is a mocked project")
+            .jsonPath("$.sections[0].media.size()")
+            .isEqualTo(1)
+            .jsonPath("$.sections[0].mainMedia.mediaType")
+            .isEqualTo("video.youtube")
             .jsonPath("$.sections[0].mainMedia.url")
             .isEqualTo("https://www.youtube.com/watch?v=tHisis4R3soURCeId")
-            .jsonPath("$.sections[0].mainMedia.thumbnailUrl").isEqualTo("http://a.video.jpg")
-            .jsonPath("$.sections[0].mainMedia.resourceId").isEqualTo("tHisis4R3soURCeId")
+            .jsonPath("$.sections[0].mainMedia.thumbnailUrl")
+            .isEqualTo("http://a.video.jpg")
+            .jsonPath("$.sections[0].mainMedia.resourceId")
+            .isEqualTo("tHisis4R3soURCeId")
     }
 
-    private fun generateContributorDto(): ContributorDto = ContributorDto(
-        setOf(ProviderUser(URL("http://issuer.com"), "subject123")),
-        "contributor@mail.com",
-        "contributorFirstName",
-        "contributorLastName",
-        A6MediaDto(
-            "image",
-            "http://image-resource.com/123",
-            "http://image-resource.com/123-thumbnail",
-            "123",
-        ),
-        null,
-        "cid1",
-    )
+    private fun generateContributorDto(): ContributorDto =
+        ContributorDto(
+            setOf(ProviderUser(URI("http://issuer.com").toURL(), "subject123")),
+            "contributor@mail.com",
+            "contributorFirstName",
+            "contributorLastName",
+            A6MediaDto(
+                "image",
+                "http://image-resource.com/123",
+                "http://image-resource.com/123-thumbnail",
+                "123",
+            ),
+            null,
+            "cid1",
+        )
 }

@@ -12,11 +12,12 @@ import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
+import org.assertj.core.api.InstanceOfAssertFactories
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.data.repository.findByIdOrNull
-import java.net.URL
+import java.net.URI
 
 @ExtendWith(MockKExtension::class)
 class ContributorServiceUnitTest {
@@ -34,7 +35,7 @@ class ContributorServiceUnitTest {
     @Throws(Exception::class)
     fun `when request get single contributor by provider user - then receive contributor`() =
         runTest {
-            val providerUser = ProviderUser(URL("http://issuer.com"), "subject123")
+            val providerUser = ProviderUser(URI("http://issuer.com").toURL(), "subject123")
             val mockedContributor = generateContributor(providerUser)
             every { repository.findDistinctByProviderUsers(providerUser) } returns mockedContributor
 
@@ -51,7 +52,7 @@ class ContributorServiceUnitTest {
         runTest {
             val contributorId = "c123"
             val mockedContributor =
-                generateContributor(ProviderUser(URL("http://issuer.com"), "subject123"))
+                generateContributor(ProviderUser(URI("http://issuer.com").toURL(), "subject123"))
             every { repository.findByIdOrNull(contributorId) } returns mockedContributor
 
             val outputContributor = service.findSingleContributor(contributorId)
@@ -65,8 +66,7 @@ class ContributorServiceUnitTest {
     @Throws(Exception::class)
     fun `when persist existing login contributor - then contributor not saved`() =
         runTest {
-            val contributorId = "c123"
-            val providerUser = ProviderUser(URL("http://issuer.com"), "subject123")
+            val providerUser = ProviderUser(URI("http://issuer.com").toURL(), "subject123")
             val mockedContributor = generateContributor(providerUser)
             every { repository.findDistinctByProviderUsers(providerUser) } returns mockedContributor
 
@@ -82,8 +82,7 @@ class ContributorServiceUnitTest {
     @Throws(Exception::class)
     fun `when persist existing new contributor - then saved to repo called`() =
         runTest {
-            val contributorId = "c123"
-            val providerUser = ProviderUser(URL("http://issuer.com"), "subject123")
+            val providerUser = ProviderUser(URI("http://issuer.com").toURL(), "subject123")
             val mockedContributor = generateContributor(providerUser)
             every { repository.findDistinctByProviderUsers(providerUser) } returns null
             every { repository.findByEmail("contributor@mail.com") } returns null
@@ -104,23 +103,24 @@ class ContributorServiceUnitTest {
     @Throws(Exception::class)
     fun `when persist existing contributor with new provider user - then saved to repo called`() =
         runTest {
-            val providerUser = ProviderUser(URL("http://other.com"), "subject456")
+            val providerUser = ProviderUser(URI("http://other.com").toURL(), "subject456")
             val mockedContributor = generateContributor(providerUser)
             every { repository.findDistinctByProviderUsers(providerUser) } returns null
-            val existingProviderUser = ProviderUser(URL("http://issuer.com"), "subject123")
-            val existingContributor = Contributor(
-                existingProviderUser,
-                "contributor@mail.com",
-                "existingFirstName",
-                "existingLastName",
-                null,
-                ContributorMedia(
-                    "image",
-                    "http://image-resource.com/456",
-                    "http://image-resource.com/456-thumbnail",
-                    "456",
-                ),
-            )
+            val existingProviderUser = ProviderUser(URI("http://issuer.com").toURL(), "subject123")
+            val existingContributor =
+                Contributor(
+                    existingProviderUser,
+                    "contributor@mail.com",
+                    "existingFirstName",
+                    "existingLastName",
+                    null,
+                    ContributorMedia(
+                        "image",
+                        "http://image-resource.com/456",
+                        "http://image-resource.com/456-thumbnail",
+                        "456",
+                    ),
+                )
             every { repository.findByEmail("contributor@mail.com") } returns existingContributor
             val updatedContributor = slot<Contributor>()
             val savedContributor = generateContributor(providerUser)
@@ -135,7 +135,8 @@ class ContributorServiceUnitTest {
             assertThat(capturedUpdatedContributor.lastName).isEqualTo(existingContributor.lastName)
             assertThat(capturedUpdatedContributor.profileMedia).isEqualTo(existingContributor.profileMedia)
             assertThat(capturedUpdatedContributor.headMedia).isEqualTo(existingContributor.headMedia)
-            assertThat(capturedUpdatedContributor.providerUsers.toList()).asList()
+            assertThat(capturedUpdatedContributor.providerUsers.toList())
+                .asInstanceOf(InstanceOfAssertFactories.LIST)
                 .contains(providerUser, existingProviderUser)
 
             verify { repository.findDistinctByProviderUsers(providerUser) }
@@ -148,7 +149,7 @@ class ContributorServiceUnitTest {
     fun `when check contributor with correct id - then contributor returned`() =
         runTest {
             val contributorId = "c123"
-            val providerUser = ProviderUser(URL("http://issuer.com"), "subject123")
+            val providerUser = ProviderUser(URI("http://issuer.com").toURL(), "subject123")
             val mockedContributor = mockkClass(Contributor::class)
             every { repository.findDistinctByProviderUsers(providerUser) } returns mockedContributor
             every { mockedContributor.id } returns contributorId
@@ -168,7 +169,7 @@ class ContributorServiceUnitTest {
         runTest {
             val contributorId = "c123"
             val otherContributorId = "other456"
-            val providerUser = ProviderUser(URL("http://issuer.com"), "subject123")
+            val providerUser = ProviderUser(URI("http://issuer.com").toURL(), "subject123")
             val mockedContributor = mockkClass(Contributor::class)
             every { repository.findDistinctByProviderUsers(providerUser) } returns mockedContributor
             every { mockedContributor.id } returns otherContributorId
@@ -182,17 +183,18 @@ class ContributorServiceUnitTest {
             verify { mockedContributor.id }
         }
 
-    private fun generateContributor(providerUser: ProviderUser): Contributor = Contributor(
-        providerUser,
-        "contributor@mail.com",
-        "contributorFirstName",
-        "contributorLastName",
-        ContributorMedia(
-            "image",
-            "http://image-resource.com/123",
-            "http://image-resource.com/123-thumbnail",
-            "123",
-        ),
-        null,
-    )
+    private fun generateContributor(providerUser: ProviderUser): Contributor =
+        Contributor(
+            providerUser,
+            "contributor@mail.com",
+            "contributorFirstName",
+            "contributorLastName",
+            ContributorMedia(
+                "image",
+                "http://image-resource.com/123",
+                "http://image-resource.com/123-thumbnail",
+                "123",
+            ),
+            null,
+        )
 }
